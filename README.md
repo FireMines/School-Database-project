@@ -5,7 +5,7 @@ This is the work of group 17
 ## Endpoint overview
 
 #### Public Endpoint:
-    mothods: GET
+    methods: GET
     data: model, type, size, description, historical, url FROM ski_type
 
 
