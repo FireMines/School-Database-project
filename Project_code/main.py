@@ -29,6 +29,43 @@ def get_customer_info():
 
         cur.close()
         return jsonify(account_info),201
+    
+@app.route('/transporter',methods=['GET'])
+def get_transporter_info():
+    
+    if request.method == 'GET':
+        
+        cur=mysql.connection.cursor()
+
+        transporter_info= cur.execute("SELECT * FROM `shipment`")
+
+        if transporter_info >0:
+            transporter_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(transporter_info),201
+    
+@app.route('/transporter',methods=['POST'])
+def change_transporter_info():
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        shipmentNumber=data['shipmentNumber']
+        transport_id=data['transporterID']
+        status=data['state']
+
+        cur=mysql.connection.cursor()
+
+        change_order_state = cur.execute("UPDATE `shipment` SET `state`=%s WHERE `shipmentNumber`=%s AND `transporterID`=%s",(status,shipmentNumber,transport_id,))
+        mysql.connection.commit()
+
+        account_info= cur.execute("SELECT * FROM `shipment`")
+
+        if account_info >0:
+            account_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(account_info),201
 
 """ 
 @app.route('/change_skiType_info',methods=['POST'])
