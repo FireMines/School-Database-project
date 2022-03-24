@@ -22,13 +22,13 @@ def get_customer_info():
         
         cur=mysql.connection.cursor()
 
-        account_info= cur.execute("SELECT * FROM `skiType`")
+        skiType_info= cur.execute("SELECT * FROM `skiType`")
 
-        if account_info >0:
-            account_info = cur.fetchall()
+        if skiType_info >0:
+            skiType_info = cur.fetchall()
 
         cur.close()
-        return jsonify(account_info),201
+        return jsonify(skiType_info),201
     
 @app.route('/transporter',methods=['GET'])
 def get_transporter_info():
@@ -66,6 +66,53 @@ def change_transporter_info():
 
         cur.close()
         return jsonify(account_info),201
+
+
+#                       #
+#   Customer endpoint   #
+#                       #
+@app.route('/customer',methods=['GET', 'POST'])
+def customer_info():
+    
+    if request.method == 'GET':
+        
+        cur=mysql.connection.cursor()
+
+        customer_info= cur.execute("SELECT * FROM `customer`")
+
+        if customer_info >0:
+            customer_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(customer_info),201
+
+#def change_customer_info():
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        start_of_contract=data['start_of_contract']
+        customer_id=data['customer_id']
+        #status=data['state']
+
+        cur=mysql.connection.cursor()
+
+        #change_order_state = cur.execute("UPDATE `shipment` SET `state`=%s WHERE `start_of_contract`=%s AND `customer_id`=%s",(status,start_of_contract,customer_id,))
+        mysql.connection.commit()
+
+        customer_info= cur.execute("SELECT * FROM `customer`")
+
+        if customer_info >0:
+            customer_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(customer_info),201
+
+    else:
+        print("Method not implemented! Choose between GET or POST instead")
+    
+    
+
+
 
 """ 
 @app.route('/change_skiType_info',methods=['POST'])
