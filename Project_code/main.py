@@ -110,8 +110,81 @@ def customer_info():
         print("Method not implemented! Choose between GET or POST instead")
     
     
+#                       #
+#   Employee endpoints  #
+#                       #
+@app.route('/customer_rep', methods = ['GET','POST'])
+def customer_rep():
 
+    if request.method == 'GET':
+        
+        cur=mysql.connection.cursor()
 
+        order_info= cur.execute("SELECT * FROM `orders` WHERE `state` IN ('new','available')")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        order_number=data['order_number']
+        state_of_order=data['state']
+
+        cur=mysql.connection.cursor()
+
+        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
+        mysql.connection.commit()
+
+        order_info= cur.execute("SELECT * FROM `orders`")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    else:
+        print("Method not implemented! Choose between GET or POST instead")
+    
+@app.route('/storekeeper', methods = ['GET','POST'])
+def storekeeper():
+
+    if request.method == 'GET':
+        
+        cur=mysql.connection.cursor()
+
+        order_info= cur.execute("SELECT * FROM `orders`")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        order_number=data['order_number']
+        state_of_order=data['state']
+
+        cur=mysql.connection.cursor()
+
+        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
+        mysql.connection.commit()
+
+        order_info= cur.execute("SELECT * FROM `orders`")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    else:
+        print("Method not implemented! Choose between GET or POST instead")
+    
 
 """ 
 @app.route('/change_skiType_info',methods=['POST'])
