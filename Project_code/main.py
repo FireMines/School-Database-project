@@ -66,6 +66,10 @@ def get_transporter_info():
 
         cur.close()
         return jsonify(account_info),201
+    
+    
+    else:
+        print("Method not implemented! Choose between GET or POST instead")
 
 
 #                       #
