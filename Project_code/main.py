@@ -30,7 +30,10 @@ def get_customer_info():
         cur.close()
         return jsonify(skiType_info),201
     
-@app.route('/transporter',methods=['GET'])
+#                                   #
+#   transporter/shipping endpoint   #
+#                                   #
+@app.route('/transporter',methods=['GET', 'POST'])
 def get_transporter_info():
     
     if request.method == 'GET':
@@ -45,10 +48,7 @@ def get_transporter_info():
         cur.close()
         return jsonify(transporter_info),201
     
-@app.route('/transporter',methods=['POST'])
-def change_transporter_info():
-    
-    if request.method == 'POST':
+    elif request.method == 'POST':
         data = request.get_json()
         shipmentNumber=data['shipmentNumber']
         transport_id=data['transporterID']
