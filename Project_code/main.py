@@ -90,13 +90,12 @@ def customer_info():
 
     elif request.method == 'POST':
         data = request.get_json()
-        start_of_contract=data['start_of_contract']
         customer_id=data['customer_id']
-        #status=data['state']
+        start_of_contract=data['startDate']
 
         cur=mysql.connection.cursor()
 
-        #change_order_state = cur.execute("UPDATE `shipment` SET `state`=%s WHERE `start_of_contract`=%s AND `customer_id`=%s",(status,start_of_contract,customer_id,))
+        change_startDate = cur.execute("UPDATE `customer` SET `start_of_contract`=%s WHERE `customer_id`=%s",(start_of_contract,customer_id,))
         mysql.connection.commit()
 
         customer_info= cur.execute("SELECT * FROM `customer`")
