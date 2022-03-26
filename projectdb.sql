@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 25. Mar, 2022 16:09 PM
--- Tjener-versjon: 10.4.22-MariaDB
--- PHP Version: 8.1.1
+-- Generation Time: Mar 26, 2022 at 04:04 PM
+-- Server version: 10.4.22-MariaDB
+-- PHP Version: 8.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,66 +24,74 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `customer`
+-- Table structure for table `customer`
 --
 
 CREATE TABLE `customer` (
-  `customer_id` int(20) NOT NULL,
+  `customerID` int(20) NOT NULL,
   `startDate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
--- Dataark for tabell `customer`
+-- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`customer_id`, `startDate`) VALUES
-(69, '2018-09-17'),
-(420, '2012-03-19');
+INSERT INTO `customer` (`customerID`, `startDate`) VALUES
+(1, '2022-03-26'),
+(2, '2022-03-26');
 
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `employee`
+-- Table structure for table `employee`
 --
 
 CREATE TABLE `employee` (
   `employeeNumber` int(20) NOT NULL,
   `name` varchar(60) COLLATE utf8_danish_ci NOT NULL,
-  `department` varchar(40) COLLATE utf8_danish_ci NOT NULL
+  `department` enum('Production planner','Storekeeper','Customer rep') COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `employee`
+--
+
+INSERT INTO `employee` (`employeeNumber`, `name`, `department`) VALUES
+(1, 'Karl Petter', 'Production planner');
 
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `franchise`
+-- Table structure for table `franchise`
 --
 
 CREATE TABLE `franchise` (
-  `name` int(20) NOT NULL,
-  `buying_price` int(60) NOT NULL,
+  `customerID` int(20) NOT NULL,
+  `name` varchar(50) COLLATE utf8_danish_ci NOT NULL,
+  `buying_price` float NOT NULL,
   `shipping_address` varchar(30) COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
--- Dataark for tabell `franchise`
+-- Dumping data for table `franchise`
 --
 
-INSERT INTO `franchise` (`name`, `buying_price`, `shipping_address`) VALUES
-(69, 9000, 'Habbo Club Veien 17');
+INSERT INTO `franchise` (`customerID`, `name`, `buying_price`, `shipping_address`) VALUES
+(2, 'BigmanINC', 9000, 'Habbo Club Veien 17');
 
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `franchise_store`
+-- Table structure for table `franchise_store`
 --
 
 CREATE TABLE `franchise_store` (
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_danish_ci NOT NULL,
-  `shipping` varchar(50) CHARACTER SET utf8 COLLATE utf8_danish_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_danish_ci;
+  `name` varchar(50) COLLATE utf8_danish_ci NOT NULL,
+  `shipping` varchar(50) COLLATE utf8_danish_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
--- Dataark for tabell `franchise_store`
+-- Dumping data for table `franchise_store`
 --
 
 INSERT INTO `franchise_store` (`name`, `shipping`) VALUES
@@ -92,19 +100,7 @@ INSERT INTO `franchise_store` (`name`, `shipping`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `individual_store`
---
-
-CREATE TABLE `individual_store` (
-  `name` int(20) NOT NULL,
-  `price` float NOT NULL,
-  `shipping_address` varchar(30) COLLATE utf8_danish_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
--- --------------------------------------------------------
-
---
--- Tabellstruktur for tabell `orders`
+-- Table structure for table `orders`
 --
 
 CREATE TABLE `orders` (
@@ -115,10 +111,18 @@ CREATE TABLE `orders` (
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`orderNumber`, `quantity`, `totalPrice`, `state`, `date`) VALUES
+(100100, 10, 1000, 'available', '2022-03-17 18:50:38'),
+(6969669, 5, 905, 'new', '2022-03-30 13:50:17');
+
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `productionplan`
+-- Table structure for table `productionplan`
 --
 
 CREATE TABLE `productionplan` (
@@ -131,7 +135,7 @@ CREATE TABLE `productionplan` (
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `shipment`
+-- Table structure for table `shipment`
 --
 
 CREATE TABLE `shipment` (
@@ -144,10 +148,17 @@ CREATE TABLE `shipment` (
   `state` enum('ready','shipped') COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
+--
+-- Dumping data for table `shipment`
+--
+
+INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `customerID`, `shippingAddress`, `pickUpDate`, `state`) VALUES
+(1, 100100, 1, 1, 'FC habbo', '2022-03-26 15:01:31', 'shipped');
+
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `ski`
+-- Table structure for table `ski`
 --
 
 CREATE TABLE `ski` (
@@ -161,7 +172,7 @@ CREATE TABLE `ski` (
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `skitype`
+-- Table structure for table `skitype`
 --
 
 CREATE TABLE `skitype` (
@@ -177,33 +188,54 @@ CREATE TABLE `skitype` (
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `teamskier`
+-- Table structure for table `store`
+--
+
+CREATE TABLE `store` (
+  `name` varchar(50) COLLATE utf8_danish_ci NOT NULL,
+  `customerID` int(20) NOT NULL,
+  `price` float NOT NULL,
+  `address` varchar(30) COLLATE utf8_danish_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teamskier`
 --
 
 CREATE TABLE `teamskier` (
-  `name` int(20) NOT NULL,
+  `name` varchar(50) COLLATE utf8_danish_ci NOT NULL,
+  `customerID` int(20) NOT NULL,
   `dateOfBirth` date NOT NULL,
   `club` varchar(100) COLLATE utf8_danish_ci NOT NULL,
   `annual_skies` int(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
--- Dataark for tabell `teamskier`
+-- Dumping data for table `teamskier`
 --
 
-INSERT INTO `teamskier` (`name`, `dateOfBirth`, `club`, `annual_skies`) VALUES
-(69, '2022-03-08', 'Habbo Club ofc 8)', 30);
+INSERT INTO `teamskier` (`name`, `customerID`, `dateOfBirth`, `club`, `annual_skies`) VALUES
+('Jens Habbosen', 1, '2012-03-06', 'FC habbo', 2);
 
 -- --------------------------------------------------------
 
 --
--- Tabellstruktur for tabell `transporter`
+-- Table structure for table `transporter`
 --
 
 CREATE TABLE `transporter` (
   `transporterID` int(20) NOT NULL,
   `name` varchar(100) COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `transporter`
+--
+
+INSERT INTO `transporter` (`transporterID`, `name`) VALUES
+(1, 'HeavyTrucker');
 
 --
 -- Indexes for dumped tables
@@ -213,7 +245,7 @@ CREATE TABLE `transporter` (
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
-  ADD PRIMARY KEY (`customer_id`);
+  ADD PRIMARY KEY (`customerID`);
 
 --
 -- Indexes for table `employee`
@@ -225,18 +257,12 @@ ALTER TABLE `employee`
 -- Indexes for table `franchise`
 --
 ALTER TABLE `franchise`
-  ADD PRIMARY KEY (`name`);
+  ADD PRIMARY KEY (`customerID`);
 
 --
 -- Indexes for table `franchise_store`
 --
 ALTER TABLE `franchise_store`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `individual_store`
---
-ALTER TABLE `individual_store`
   ADD PRIMARY KEY (`name`);
 
 --
@@ -276,10 +302,17 @@ ALTER TABLE `skitype`
   ADD PRIMARY KEY (`typeID`);
 
 --
+-- Indexes for table `store`
+--
+ALTER TABLE `store`
+  ADD PRIMARY KEY (`name`),
+  ADD KEY `customerID` (`customerID`);
+
+--
 -- Indexes for table `teamskier`
 --
 ALTER TABLE `teamskier`
-  ADD KEY `customerID` (`name`);
+  ADD KEY `customerID` (`customerID`);
 
 --
 -- Indexes for table `transporter`
@@ -288,47 +321,105 @@ ALTER TABLE `transporter`
   ADD PRIMARY KEY (`transporterID`);
 
 --
--- Begrensninger for dumpede tabeller
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- Begrensninger for tabell `franchise`
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `employee`
+--
+ALTER TABLE `employee`
+  MODIFY `employeeNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `orderNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6969670;
+
+--
+-- AUTO_INCREMENT for table `shipment`
+--
+ALTER TABLE `shipment`
+  MODIFY `shipmentNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `ski`
+--
+ALTER TABLE `ski`
+  MODIFY `productID` int(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `skitype`
+--
+ALTER TABLE `skitype`
+  MODIFY `typeID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `store`
+--
+ALTER TABLE `store`
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `teamskier`
+--
+ALTER TABLE `teamskier`
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `transporter`
+--
+ALTER TABLE `transporter`
+  MODIFY `transporterID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `franchise`
 --
 ALTER TABLE `franchise`
-  ADD CONSTRAINT `franchise_ibfk_1` FOREIGN KEY (`name`) REFERENCES `customer` (`customer_id`);
+  ADD CONSTRAINT `franchise_ibfk_1` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`);
 
 --
--- Begrensninger for tabell `individual_store`
---
-ALTER TABLE `individual_store`
-  ADD CONSTRAINT `individual_store_ibfk_1` FOREIGN KEY (`name`) REFERENCES `customer` (`customer_id`);
-
---
--- Begrensninger for tabell `productionplan`
+-- Constraints for table `productionplan`
 --
 ALTER TABLE `productionplan`
   ADD CONSTRAINT `productionplan_ibfk_1` FOREIGN KEY (`employeeNumber`) REFERENCES `employee` (`employeeNumber`),
   ADD CONSTRAINT `productionplan_ibfk_2` FOREIGN KEY (`typeID`) REFERENCES `skitype` (`typeID`);
 
 --
--- Begrensninger for tabell `shipment`
+-- Constraints for table `shipment`
 --
 ALTER TABLE `shipment`
   ADD CONSTRAINT `shipment_ibfk_1` FOREIGN KEY (`transporterID`) REFERENCES `transporter` (`transporterID`),
-  ADD CONSTRAINT `shipment_ibfk_2` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customer_id`),
+  ADD CONSTRAINT `shipment_ibfk_2` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`),
   ADD CONSTRAINT `shipment_ibfk_3` FOREIGN KEY (`orderNumber`) REFERENCES `orders` (`orderNumber`);
 
 --
--- Begrensninger for tabell `ski`
+-- Constraints for table `ski`
 --
 ALTER TABLE `ski`
   ADD CONSTRAINT `ski_ibfk_1` FOREIGN KEY (`typeID`) REFERENCES `skitype` (`typeID`);
 
 --
--- Begrensninger for tabell `teamskier`
+-- Constraints for table `store`
+--
+ALTER TABLE `store`
+  ADD CONSTRAINT `store_ibfk_1` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`);
+
+--
+-- Constraints for table `teamskier`
 --
 ALTER TABLE `teamskier`
-  ADD CONSTRAINT `teamskier_ibfk_1` FOREIGN KEY (`name`) REFERENCES `customer` (`customer_id`);
+  ADD CONSTRAINT `teamskier_ibfk_1` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
