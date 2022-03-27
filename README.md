@@ -14,7 +14,7 @@ This is the work of group 17
     data: * FROM ski_order, start, end FROM production_plan
 
 
-#### Transporter Endpoint:
+#### Transporter Endpoint (/transporter):
     method: GET, PUT
     data: * FROM shipment
 
