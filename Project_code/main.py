@@ -33,7 +33,7 @@ def get_customer_info():
 #                                   #
 #   transporter/shipping endpoint   #
 #                                   #
-@app.route('/transporter',methods=['GET', 'POST'])
+@app.route('/transporter',methods=['GET', 'PUT'])
 def get_transporter_info():
     
     if request.method == 'GET':
@@ -48,7 +48,7 @@ def get_transporter_info():
         cur.close()
         return jsonify(transporter_info),201
     
-    elif request.method == 'POST':
+    elif request.method == 'PUT':
         data = request.get_json()
         shipmentNumber=data['shipmentNumber']
         transport_id=data['transporterID']
