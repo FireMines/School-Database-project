@@ -4,12 +4,12 @@ This is the work of group 17
 
 ## Endpoint overview
 
-#### Public Endpoint:
+#### Public Endpoint (/skiType):
     methods: GET
     data: model, type, size, description, historical, url FROM ski_type
 
 
-#### Customer Endpoint:
+#### Customer Endpoint (/customer):
     method: GET, POST, DELETE
     data: * FROM ski_order, start, end FROM production_plan
 
@@ -20,11 +20,11 @@ This is the work of group 17
 
 
 #### Employee Endpoint:
-###### Customer rep: 
+###### Customer rep (/customer_rep): 
     methods: GET, PUT, POST
     data: * FROM ski_order, * FROM shipment
 
-###### Storekeeper:
+###### Storekeeper (/storekeeper):
     methods: GET, POST, PUT
     data: * FROM ski_order, * FROM product
 
