@@ -117,14 +117,51 @@ def customer_info():
 #                       #
 #   Employee endpoints  #
 #                       #
-@app.route('/customer_rep', methods = ['GET','POST'])
+@app.route('/customer_rep', methods = ['GET','POST','PUT'])
 def customer_rep():
 
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
 
-        order_info= cur.execute("SELECT * FROM `orders` WHERE `state` IN ('new','available')")
+        order_info= cur.execute("SELECT * FROM `orders`")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        order_number=data['order_number']
+        state_of_order=data['state']
+
+        cur=mysql.connection.cursor()
+
+        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
+        mysql.connection.commit()
+
+        order_info= cur.execute("SELECT * FROM `orders`")
+
+        if order_info >0:
+            order_info = cur.fetchall()
+
+        cur.close()
+        return jsonify(order_info),201
+
+    else:
+        print("Method not implemented! Choose between GET or POST instead")
+
+   
+@app.route('/storekeeper', methods = ['GET','POST','PUT'])
+def storekeeper():
+
+    if request.method == 'GET':
+        
+        cur=mysql.connection.cursor()
+
+        order_info= cur.execute("SELECT * FROM `orders` WHERE `state` = 'available'")
 
         if order_info >0:
             order_info = cur.fetchall()
@@ -152,39 +189,22 @@ def customer_rep():
 
     else:
         print("Method not implemented! Choose between GET or POST instead")
-    
-@app.route('/storekeeper', methods = ['GET','POST'])
-def storekeeper():
+
+
+@app.route('/production_planner', methods = ['GET','PUT'])
+def production_planner():
 
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
 
-        order_info= cur.execute("SELECT * FROM `orders`")
+        plan_info= cur.execute("SELECT * FROM `productionplan`")
 
-        if order_info >0:
-            order_info = cur.fetchall()
-
-        cur.close()
-        return jsonify(order_info),201
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        order_number=data['order_number']
-        state_of_order=data['state']
-
-        cur=mysql.connection.cursor()
-
-        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
-        mysql.connection.commit()
-
-        order_info= cur.execute("SELECT * FROM `orders`")
-
-        if order_info >0:
-            order_info = cur.fetchall()
+        if plan_info >0:
+            plan_info = cur.fetchall()
 
         cur.close()
-        return jsonify(order_info),201
+        return jsonify(plan_info),201
 
     else:
         print("Method not implemented! Choose between GET or POST instead")
