@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2022 at 04:04 PM
+-- Generation Time: Mar 28, 2022 at 04:54 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.0.14
 
@@ -217,7 +217,8 @@ CREATE TABLE `teamskier` (
 --
 
 INSERT INTO `teamskier` (`name`, `customerID`, `dateOfBirth`, `club`, `annual_skies`) VALUES
-('Jens Habbosen', 1, '2012-03-06', 'FC habbo', 2);
+('Jens Habbosen', 1, '2012-03-06', 'FC habbo', 2),
+('test', 2, '2022-03-14', 'yaya', 22);
 
 -- --------------------------------------------------------
 
@@ -370,7 +371,7 @@ ALTER TABLE `store`
 -- AUTO_INCREMENT for table `teamskier`
 --
 ALTER TABLE `teamskier`
-  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `transporter`
