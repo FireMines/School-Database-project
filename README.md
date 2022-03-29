@@ -58,9 +58,32 @@ URL: http://127.0.0.1:5000/customer
 
 Body:
 
+For teamskier:
+
     {
+    "customerID": 17,
+    "startDate": "2022-09-17 12:23:34",
+    "name": "Per Person",
+    "dateOfBirth": "2015-09-19 12:23:34",
+    "club": "Test Club",
+    "annual_skies": 50,
+    }
+For store:
+
+    {  
     "customerID": 2,
-    "startDate": "2022-09-17 12:23:34"
+    "name": "Hei Hei",
+    "buying_price": 420,
+    "shipping_address": "Habbos havn"
+    }
+For franchise:
+
+    {
+    "customerID": 10,
+    "startDate": "2022-09-19 12:23:34",
+    "name": "Hei Hei",
+    "buying_price": 420,
+    "shipping_address": "Habbos havn"
     }
 
 Method: DELETE
