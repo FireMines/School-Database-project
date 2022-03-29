@@ -139,12 +139,14 @@ def customer_info():
         print("Method not implemented! Choose between GET, POST or PUT instead")
     
     
-#                       #
-#   Employee endpoints  #
-#                       #
+#                               #
+#   Customer rep endpoints      #
+#                               #
 @app.route('/customer_rep', methods = ['GET','POST','PUT'])
 def customer_rep():
 
+    #           #
+    #   GET     #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
@@ -157,6 +159,8 @@ def customer_rep():
         cur.close()
         return jsonify(order_info),201
 
+    #           #
+    #   PUT     #
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
@@ -175,6 +179,8 @@ def customer_rep():
         cur.close()
         return jsonify(order_info),201
 
+    #           #
+    #   POST    #
     elif request.method == 'POST':
         data = request.get_json()
         shipment_number=data['shipment_number']
@@ -207,10 +213,14 @@ def customer_rep():
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")
 
-   
+#                               #
+#   Storekeeper endpoints       #
+#                               #  
 @app.route('/storekeeper', methods = ['GET','POST','PUT'])
 def storekeeper():
 
+    #           #
+    #   GET     #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
@@ -223,7 +233,9 @@ def storekeeper():
         cur.close()
         return jsonify(order_info),201
 
-    elif request.method == 'POST':
+    #           #
+    #   POST    #
+    elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
         state_of_order=data['state']
@@ -241,13 +253,59 @@ def storekeeper():
         cur.close()
         return jsonify(order_info),201
 
+    #           #
+    #   POST    #
+    elif request.method == 'POST':
+        data = request.get_json()
+        #skiType data
+        type_id = data['typeID']
+        ski_type= data['type']
+        model_type= data['model']
+        ski_decription =data['decription']
+        image_url = data['image']
+        msrp = data['msrp']
+        #product data
+        product_id=data['productID']
+        ski_length=data['length']
+        ski_weight=data['weight']
+
+        cur=mysql.connection.cursor()
+
+        product_info= cur.execute("SELECT * FROM `ski` WHERE `productID`=%s", (product_id,))
+
+        if product_info <=0:
+            
+            ski_type_info = cur.execute("SELECT * FROM `skitype` WHERE `typeID`=%s", (type_id,))
+
+            if ski_type_info <=0:
+                change_state = cur.execute("INSERT INTO `skitype`(`typeID`, `type`, `model`, `description`, `url`, `msrp`) VALUES (%s,%s,%s,%s,%s,%s)", (type_id, ski_type, model_type, ski_decription, image_url, msrp))
+                mysql.connection.commit()
+
+            change_state = cur.execute("INSERT INTO `ski`(`productID`, `typeID`, `length`, `weight`) VALUES (%s, %s, %s, %s)", (product_id, type_id, ski_length, ski_weight,))
+            mysql.connection.commit()
+
+            shipments_info= cur.execute("SELECT * FROM `ski`")
+
+            if shipments_info >0:
+                shipments_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(shipments_info),201
+        else :
+            cur.close()
+            return "This product already exist in the database"
+
     else:
-        print("Method not implemented! Choose between GET or POST instead")
+        print("Method not implemented! Choose between GET, PUT or POST instead")
 
-
+#                                   #
+#   Production planner endpoints    #
+#                                   #
 @app.route('/production_planner', methods = ['GET','PUT'])
 def production_planner():
 
+    #           #
+    #   GET     #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
