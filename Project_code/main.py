@@ -150,8 +150,37 @@ def customer_rep():
         cur.close()
         return jsonify(order_info),201
 
+    elif request.method == 'POST':
+        data = request.get_json()
+        shipment_number=data['shipment_number']
+        order_number=data['order_number']
+        transporter_id=data['transporterID']
+        customer_id=data['customerID']
+        shipping_address=data['address']
+        pick_up_date=data['date']
+        state=data['state']
+
+        cur=mysql.connection.cursor()
+
+        shipment_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number))
+
+        if shipment_info <=0:
+            change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `customerID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, %s, %s)", (shipment_number, order_number, transporter_id, customer_id, shipping_address, pick_up_date, state,))
+            mysql.connection.commit()
+
+            shipments_info= cur.execute("SELECT * FROM `shipment`")
+
+            if shipments_info >0:
+                shipments_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(shipments_info),201
+        else :
+            cur.close()
+            return "A shipment with this shipment number already exists"
+            
     else:
-        print("Method not implemented! Choose between GET or POST instead")
+        print("Method not implemented! Choose between GET, PUT or POST instead")
 
    
 @app.route('/storekeeper', methods = ['GET','POST','PUT'])
