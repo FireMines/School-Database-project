@@ -11,12 +11,7 @@ app.config['MYSQL_DB']="projectdb"
 mysql = MySQL(app)
 
 @app.route('/')
-def home():
-   return render_template('index.html')
-
-
-@app.route('/skiType',methods=['GET'])
-def get_customer_info():
+def get_skitype_info():
     
     if request.method == 'GET':
         
