@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_mysqldb import MySQL
 
 app = Flask(__name__)
@@ -11,8 +11,8 @@ app.config['MYSQL_DB']="projectdb"
 mysql = MySQL(app)
 
 @app.route('/')
-def index():
-    return "Hello"
+def home():
+   return render_template('index.html')
 
 
 @app.route('/skiType',methods=['GET'])
