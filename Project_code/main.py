@@ -75,7 +75,7 @@ def get_transporter_info():
 #                       #
 #   Customer endpoint   #
 #                       #
-@app.route('/customer',methods=['GET', 'POST'])
+@app.route('/customer',methods=['GET', 'POST', 'PUT'])
 def customer_info():
     
     if request.method == 'GET':
@@ -90,16 +90,14 @@ def customer_info():
         cur.close()
         return jsonify(customer_info),201
 
-#def change_customer_info():
-
-    elif request.method == 'POST':
+    elif request.method == 'PUT':
         data = request.get_json()
-        customer_id=data['customer_id']
+        customer_id=data['customerID']
         start_of_contract=data['startDate']
 
         cur=mysql.connection.cursor()
 
-        change_startDate = cur.execute("UPDATE `customer` SET `start_of_contract`=%s WHERE `customer_id`=%s",(start_of_contract,customer_id,))
+        change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
         mysql.connection.commit()
 
         customer_info= cur.execute("SELECT * FROM `customer`")
@@ -110,8 +108,35 @@ def customer_info():
         cur.close()
         return jsonify(customer_info),201
 
+    elif request.method == 'POST':
+        data = request.get_json()
+        customer_id=data['customerID']
+        name=data['name']
+        dob=data['dateOfBirth']
+        club=data['club']
+        annual_skies=data['annual_skies']
+
+        cur=mysql.connection.cursor()
+
+        team_skier_info = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
+
+        if team_skier_info <= 0:
+            change_teamskier_info = cur.execute("INSERT INTO `teamskier` (`customerID`, `name`, `dateOfBirth`, `club`, `annual_skies`) VALUES (%s,%s,%s,%s,%s)", (customer_id, name, dob, club, annual_skies))
+            mysql.connection.commit()
+
+            team_skier_info1 = cur.execute("SELECT * FROM `teamskier`")
+
+            if team_skier_info1 > 0:
+                team_skier_info1 = cur.fetchall()
+
+            cur.close()
+            return jsonify(team_skier_info1),201
+        else : 
+            cur.close()
+            return "Team Skier with that customerID already exists"
+
     else:
-        print("Method not implemented! Choose between GET or POST instead")
+        print("Method not implemented! Choose between GET, POST or PUT instead")
     
     
 #                       #
