@@ -70,7 +70,7 @@ def get_transporter_info():
 #                       #
 #   Customer endpoint   #
 #                       #
-@app.route('/customer',methods=['GET', 'POST', 'PUT'])
+@app.route('/customer',methods=['GET', 'POST', 'PUT', 'DELETE'])
 def customer_info():
     
     if request.method == 'GET':
@@ -218,8 +218,94 @@ def customer_info():
             cur.close()
             return "Unable to add a customer, customerID already exists!"
 
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        customer_id=data['customerID']
+        start_of_contract=data['startDate']
+
+        cur=mysql.connection.cursor()
+
+        checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
+        checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
+        checkIfFranchise = cur.execute("SELECT * FROM `franchise` WHERE `customerID`=%s", (customer_id,))
+        checkIfValidID = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
+
+        print("Skier: 1 Means exists, 0 means does not: ", checkIfTeamSkier)
+        print("Store: 1 Means exists, 0 means does not: ", checkIfIndivStore)
+        print("Franchise: 1 Means exists, 0 means does not: ", checkIfFranchise)
+
+        print(checkIfValidID)
+        if checkIfValidID <= 0:
+            return "No customer with that ID!"
+
+        if checkIfTeamSkier and checkIfIndivStore and checkIfFranchise < 0: 
+            return "Not in any of its mandatory tables"
+
+
+        if checkIfTeamSkier > 0:
+            #name=data['name']
+            #dob=data['dateOfBirth']
+            #club=data['club']
+            #annual_skies=data['annual_skies']
+
+            deleteTeamSkier = cur.execute("DELETE FROM `teamskier` WHERE `teamskier`.`customerID` = %s",(customer_id,))
+            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
+            mysql.connection.commit()
+
+            customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
+
+            if customer_info > 0:
+                customer_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(customer_info),201
+
+
+        if checkIfIndivStore > 0:
+            #name=data['name']
+            #price=data['price']
+            #address=data['address']
+
+            deleteIndivStore = cur.execute("DELETE FROM `store` WHERE `store`.`customerID` = %s",(customer_id,))
+            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
+            mysql.connection.commit()
+
+            customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
+
+            if customer_info > 0:
+                customer_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(customer_info),201
+
+        if checkIfFranchise > 0:
+            name=data['name']
+            #price=data['buying_price']
+            #address=data['shipping_address']
+
+            checkIfFranchise_store = cur.execute("SELECT * FROM `franchise_store` WHERE `name`=%s", (name,))
+
+            deleteFranchise = cur.execute("DELETE FROM `franchise` WHERE `franchise`.`customerID` = %s",(customer_id,))
+            change_startDate = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
+            
+            if checkIfFranchise_store > 0:
+                shipping=data['shipping']
+                deleteFranchise_Store = cur.execute("DELETE FROM `franchise_store` WHERE `franchise_store`.`name` = %s",(name,))
+
+            
+            mysql.connection.commit()
+
+            customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
+
+            if customer_info > 0:
+                customer_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(customer_info),201
+
+
     else:
-        print("Method not implemented! Choose between GET, POST or PUT instead")
+        print("Method not implemented! Choose between GET, POST, PUT or DELETE instead")
     
     
 #                               #
