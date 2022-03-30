@@ -316,6 +316,7 @@ def customer_rep():
 
     #           #
     #   GET     #
+    #           #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
@@ -330,6 +331,7 @@ def customer_rep():
 
     #           #
     #   PUT     #
+    #           #
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
@@ -350,6 +352,7 @@ def customer_rep():
 
     #           #
     #   POST    #
+    #           #
     elif request.method == 'POST':
         data = request.get_json()
         shipment_number=data['shipment_number']
@@ -390,6 +393,7 @@ def storekeeper():
 
     #           #
     #   GET     #
+    #           #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
@@ -403,7 +407,8 @@ def storekeeper():
         return jsonify(order_info),201
 
     #           #
-    #   POST    #
+    #   PUT     #
+    #           #
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
@@ -424,6 +429,7 @@ def storekeeper():
 
     #           #
     #   POST    #
+    #           #
     elif request.method == 'POST':
         data = request.get_json()
         #skiType data
@@ -475,6 +481,7 @@ def production_planner():
 
     #           #
     #   GET     #
+    #           #
     if request.method == 'GET':
         
         cur=mysql.connection.cursor()
