@@ -333,20 +333,32 @@ def customer_rep():
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
-        state_of_order=data['state']
+        #state_of_order=data['state']
 
         cur=mysql.connection.cursor()
 
-        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
-        mysql.connection.commit()
-
-        order_info= cur.execute("SELECT * FROM `orders`")
+        order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state` IN ('new', 'open')", (order_number,))
 
         if order_info >0:
-            order_info = cur.fetchall()
+            state_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state`='new'", (order_number,))
+            if state_info >0:
+                change_state = cur.execute("UPDATE `orders` SET `state`='open' WHERE `orderNumber`=%s",(order_number,))
+                mysql.connection.commit()
+            else: 
+                change_state = cur.execute("UPDATE `orders` SET `state`='available' WHERE `orderNumber`=%s",(order_number,))
+                mysql.connection.commit()
 
-        cur.close()
-        return jsonify(order_info),201
+            order_info= cur.execute("SELECT * FROM `orders`")
+
+            if order_info >0:
+                order_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(order_info),201
+
+        else:
+            cur.close()
+            return "No orders with that order number that are new or open", 400
 
     #           #
     #   POST    #
@@ -358,14 +370,16 @@ def customer_rep():
         customer_id=data['customerID']
         shipping_address=data['address']
         pick_up_date=data['date']
-        state=data['state']
 
         cur=mysql.connection.cursor()
 
         shipment_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number))
+        order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (order_number,))
+        transporter_info =cur.execute("SELECT * FROM `transporter` WHERE `transporterID`=%s", (transporter_id,))
+        customer_info =cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
 
-        if shipment_info <=0:
-            change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `customerID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, %s, %s)", (shipment_number, order_number, transporter_id, customer_id, shipping_address, pick_up_date, state,))
+        if shipment_info <=0 and (order_info and transporter_info and customer_info >0):
+            change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `customerID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, %s, 'ready')", (shipment_number, order_number, transporter_id, customer_id, shipping_address, pick_up_date,))
             mysql.connection.commit()
 
             shipments_info= cur.execute("SELECT * FROM `shipment`")
@@ -377,7 +391,10 @@ def customer_rep():
             return jsonify(shipments_info),201
         else :
             cur.close()
-            return "A shipment with this shipment number already exists"
+            if shipment_info >0:
+                return "A shipment with this shipment number already exists",400
+            else:
+                return "Tried to create shipment with non existing order, customer or transporter",400
             
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")
@@ -403,24 +420,31 @@ def storekeeper():
         return jsonify(order_info),201
 
     #           #
-    #   POST    #
+    #   PUT     #
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
-        state_of_order=data['state']
 
         cur=mysql.connection.cursor()
 
-        change_state = cur.execute("UPDATE `orders` SET `state`=%s WHERE `orderNumber`=%s",(state_of_order,order_number))
-        mysql.connection.commit()
-
-        order_info= cur.execute("SELECT * FROM `orders`")
+        order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state`='available'",(order_number,))
 
         if order_info >0:
-            order_info = cur.fetchall()
+            change_state = cur.execute("UPDATE `orders` SET `state`='ready' WHERE `orderNumber`=%s",(order_number,))
+            mysql.connection.commit()
 
-        cur.close()
-        return jsonify(order_info),201
+            order_info= cur.execute("SELECT * FROM `orders`")
+
+            if order_info >0:
+                order_info = cur.fetchall()
+
+            cur.close()
+            return jsonify(order_info),201
+
+        else:
+            cur.close()
+            return "There is no order with this order number that is available to be ready to be shipped!",400
+        
 
     #           #
     #   POST    #
@@ -428,11 +452,6 @@ def storekeeper():
         data = request.get_json()
         #skiType data
         type_id = data['typeID']
-        ski_type= data['type']
-        model_type= data['model']
-        ski_decription =data['decription']
-        image_url = data['image']
-        msrp = data['msrp']
         #product data
         product_id=data['productID']
         ski_length=data['length']
@@ -447,6 +466,11 @@ def storekeeper():
             ski_type_info = cur.execute("SELECT * FROM `skitype` WHERE `typeID`=%s", (type_id,))
 
             if ski_type_info <=0:
+                ski_type= data['type']
+                model_type= data['model']
+                ski_decription =data['decription']
+                image_url = data['image']
+                msrp = data['msrp']
                 change_state = cur.execute("INSERT INTO `skitype`(`typeID`, `type`, `model`, `description`, `url`, `msrp`) VALUES (%s,%s,%s,%s,%s,%s)", (type_id, ski_type, model_type, ski_decription, image_url, msrp))
                 mysql.connection.commit()
 
@@ -462,7 +486,7 @@ def storekeeper():
             return jsonify(shipments_info),201
         else :
             cur.close()
-            return "This product already exist in the database"
+            return "This product already exist in the database",400
 
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")
@@ -489,77 +513,6 @@ def production_planner():
 
     else:
         print("Method not implemented! Choose between GET or POST instead")
-    
-
-""" 
-@app.route('/change_skiType_info',methods=['POST'])
-def change_customer_info():
-    
-    if request.method == 'POST':
-        data = request.get_json()
-        typeID=data['typeID']
-        type=data['type']
-        #model=data['model']
-        #description=data['description']
-        historical=data['historical']
-        #url=data['url']
-        #msrp=data['msrp']
-
-        cur=mysql.connection.cursor()
-
-        change_order_state = cur.execute("UPDATE `customer` SET `historical`=%s WHERE `type`=%s AND `typeID`=%s",(historical,type,typeID,))
-        mysql.connection.commit()
-
-        account_info= cur.execute("SELECT * FROM `skiType`")
-
-        if account_info >0:
-            account_info = cur.fetchall()
-
-        cur.close()
-        return jsonify(account_info),201
-
- """
-""" 
-@app.route('/get_customer_info',methods=['GET'])
-def get_customer_info():
-    
-    if request.method == 'GET':
-        
-        cur=mysql.connection.cursor()
-
-        account_info= cur.execute("SELECT * FROM `customer`")
-
-        if account_info >0:
-            account_info = cur.fetchall()
-
-        cur.close()
-        return jsonify(account_info),201
-
-
-@app.route('/change_customer_info',methods=['POST'])
-def change_customer_info():
-    
-    if request.method == 'POST':
-        data = request.get_json()
-        customer_id=data['customer_id']
-        customer_name=data['customer_name']
-        #startDate=data['startDate']
-        #endDate=data['endDate']
-        address=data['address']
-
-        cur=mysql.connection.cursor()
-
-        change_order_state = cur.execute("UPDATE `customer` SET `address`=%s WHERE `customer_name`=%s AND `customer_id`=%s",(address,customer_name,customer_id,))
-        mysql.connection.commit()
-
-        account_info= cur.execute("SELECT * FROM `customer`")
-
-        if account_info >0:
-            account_info = cur.fetchall()
-
-        cur.close()
-        return jsonify(account_info),201
- """
 
 
 if __name__ == '__main__':
