@@ -289,7 +289,7 @@ ALTER TABLE `productionplan`
 -- Indexes for table `productionplanreference`
 --
 ALTER TABLE `productionplanreference`
-  ADD PRIMARY KEY (`planID`),
+  ADD KEY `PlanReference_planID_FK` (`planID`),
   ADD KEY `PlanReference_Ski_FK` (`productID`);
 
 --

@@ -511,10 +511,15 @@ def production_planner():
     #   GET     #
     #           #
     if request.method == 'GET':
+        data=request.get_json()
         
         cur=mysql.connection.cursor()
 
-        plan_info= cur.execute("SELECT * FROM `productionplan`")
+        if data:
+            plan_id =data['planID']
+            plan_info= cur.execute("SELECT * FROM `productionplanreference` INNER JOIN `productionplan` ON `productionplanreference`.`planID`=`productionplan`.`planID` WHERE `productionplan`.`planID`=%s", (plan_id,))
+        else:
+            plan_info= cur.execute("SELECT * FROM `productionplan`")
 
         if plan_info >0:
             plan_info = cur.fetchall()
