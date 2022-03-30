@@ -1,3 +1,5 @@
+from asyncio.windows_events import NULL
+from types import NoneType
 from flask import Flask, request, jsonify, render_template
 from flask_mysqldb import MySQL
 
@@ -318,10 +320,15 @@ def customer_rep():
     #   GET     #
     #           #
     if request.method == 'GET':
-        
+        data=request.get_json()
+
         cur=mysql.connection.cursor()
 
-        order_info= cur.execute("SELECT * FROM `orders`")
+        if data:
+            state= data['state']
+            order_info= cur.execute("SELECT * FROM `orders` WHERE `state`=%s", (state,))
+        else:
+            order_info= cur.execute("SELECT * FROM `orders`")
 
         if order_info >0:
             order_info = cur.fetchall()
@@ -335,8 +342,7 @@ def customer_rep():
     elif request.method == 'PUT':
         data = request.get_json()
         order_number=data['order_number']
-        #state_of_order=data['state']
-
+    
         cur=mysql.connection.cursor()
 
         order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state` IN ('new', 'open')", (order_number,))
@@ -350,7 +356,7 @@ def customer_rep():
                 change_state = cur.execute("UPDATE `orders` SET `state`='available' WHERE `orderNumber`=%s",(order_number,))
                 mysql.connection.commit()
 
-            order_info= cur.execute("SELECT * FROM `orders`")
+            order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (order_number,))
 
             if order_info >0:
                 order_info = cur.fetchall()
@@ -370,7 +376,6 @@ def customer_rep():
         shipment_number=data['shipment_number']
         order_number=data['order_number']
         transporter_id=data['transporterID']
-        customer_id=data['customerID']
         shipping_address=data['address']
         pick_up_date=data['date']
 
@@ -379,13 +384,12 @@ def customer_rep():
         shipment_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number))
         order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (order_number,))
         transporter_info =cur.execute("SELECT * FROM `transporter` WHERE `transporterID`=%s", (transporter_id,))
-        customer_info =cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
 
-        if shipment_info <=0 and (order_info and transporter_info and customer_info >0):
-            change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `customerID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, %s, 'ready')", (shipment_number, order_number, transporter_id, customer_id, shipping_address, pick_up_date,))
+        if shipment_info <=0 and (order_info and transporter_info >0):
+            change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, 'ready')", (shipment_number, order_number, transporter_id, shipping_address, pick_up_date,))
             mysql.connection.commit()
 
-            shipments_info= cur.execute("SELECT * FROM `shipment`")
+            shipments_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number,))
 
             if shipments_info >0:
                 shipments_info = cur.fetchall()
@@ -397,7 +401,7 @@ def customer_rep():
             if shipment_info >0:
                 return "A shipment with this shipment number already exists",400
             else:
-                return "Tried to create shipment with non existing order, customer or transporter",400
+                return "Tried to create shipment with non existing order or transporter",400
             
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")
