@@ -1,6 +1,6 @@
 from asyncio.windows_events import NULL
 from types import NoneType
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 
 app = Flask(__name__)
@@ -504,7 +504,7 @@ def storekeeper():
 #                                   #
 #   Production planner endpoints    #
 #                                   #
-@app.route('/production_planner', methods = ['GET','PUT'])
+@app.route('/production_planner', methods = ['GET','POST'])
 def production_planner():
 
     #           #

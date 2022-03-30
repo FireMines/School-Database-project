@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 30, 2022 at 07:03 PM
+-- Generation Time: Mar 31, 2022 at 12:22 AM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.0.14
 
@@ -28,9 +28,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `authenticator` (
-  `token` varchar(50) COLLATE utf8_danish_ci NOT NULL,
+  `token` varchar(100) COLLATE utf8_danish_ci NOT NULL,
   `role` varchar(50) COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `authenticator`
+--
+
+INSERT INTO `authenticator` (`token`, `role`) VALUES
+('thisisaproductionplannertoken', 'ProductionPlanner'),
+('thisisacustomerreptoken', 'CustomerRep'),
+('thisisatransportertoken', 'Transporter'),
+('thisisacustomertoken', 'customer'),
+('thisisastorekeepertoken', 'Storekeeper');
 
 -- --------------------------------------------------------
 
@@ -131,6 +142,13 @@ CREATE TABLE `productionplan` (
   `endDate` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
+--
+-- Dumping data for table `productionplan`
+--
+
+INSERT INTO `productionplan` (`employeeNumber`, `planID`, `startDate`, `endDate`) VALUES
+(1, 1, '2022-03-30', '2022-07-30');
+
 -- --------------------------------------------------------
 
 --
@@ -139,9 +157,19 @@ CREATE TABLE `productionplan` (
 
 CREATE TABLE `productionplanreference` (
   `planID` int(11) NOT NULL,
-  `productID` int(11) NOT NULL,
-  `Quantity` int(11) NOT NULL
+  `productID` int(20) NOT NULL,
+  `Quantity` int(11) NOT NULL,
+  `ReferenceID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `productionplanreference`
+--
+
+INSERT INTO `productionplanreference` (`planID`, `productID`, `Quantity`, `ReferenceID`) VALUES
+(1, 1, 13, 1),
+(1, 2, 33, 2),
+(1, 3, 5, 3);
 
 -- --------------------------------------------------------
 
@@ -172,6 +200,15 @@ CREATE TABLE `ski` (
   `reserved` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
+--
+-- Dumping data for table `ski`
+--
+
+INSERT INTO `ski` (`productID`, `typeID`, `length`, `weight`, `reserved`) VALUES
+(1, 1, '147', '50-60', NULL),
+(2, 2, '182', '50-60', NULL),
+(3, 1, '202', '60-70', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -187,6 +224,14 @@ CREATE TABLE `skitype` (
   `url` varchar(255) COLLATE utf8_danish_ci NOT NULL,
   `msrp` decimal(15,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `skitype`
+--
+
+INSERT INTO `skitype` (`typeID`, `type`, `model`, `description`, `historical`, `url`, `msrp`) VALUES
+(1, 'classic', 'activePro', 'it looks cool and goes fast', 0, 'https://i1.adis.ws/s/madshus/madshus_2021_redline-3-skate-f2?w=340&qlt=100&fmt=webp&fmt.interlaced=true&bg=white&dpi=96', '7700.00'),
+(2, 'classic', 'racePro', 'it looks cool and goes fast but green', 0, 'https://i1.adis.ws/s/madshus/madshus_2122_redline-3-skate-green-ltd?w=340&qlt=100&fmt=webp&fmt.interlaced=true&bg=white&dpi=96', '3600.00');
 
 -- --------------------------------------------------------
 
@@ -289,8 +334,9 @@ ALTER TABLE `productionplan`
 -- Indexes for table `productionplanreference`
 --
 ALTER TABLE `productionplanreference`
-  ADD KEY `PlanReference_planID_FK` (`planID`),
-  ADD KEY `PlanReference_Ski_FK` (`productID`);
+  ADD PRIMARY KEY (`ReferenceID`),
+  ADD KEY `productionplanreference_ibfk_1` (`planID`) USING BTREE,
+  ADD KEY `productionplanreference_ibfk_2` (`productID`) USING BTREE;
 
 --
 -- Indexes for table `shipment`
@@ -364,13 +410,13 @@ ALTER TABLE `shipment`
 -- AUTO_INCREMENT for table `ski`
 --
 ALTER TABLE `ski`
-  MODIFY `productID` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `productID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `skitype`
 --
 ALTER TABLE `skitype`
-  MODIFY `typeID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `typeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `store`
