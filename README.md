@@ -16,7 +16,7 @@ First you need to open up Xampp and press `Start` on _Apache_ and _MySQL_, then 
 Start by opening a terminal in the project folder, then type : `& C:\Database_Project\virt_env\Scripts\Activate.ps1` and press enter. After you have done this, you should see something among the lines of `(virt_env) PS C:\Database_Project>`. When this is done, simply write `python Project_code/main.py` in your terminal and press enter.
 When all this is done, open up _Postman_ and enter the GET, POST, PUT or DELETE endpoints of your choosing. **NB!** Remember to start the address in Postman with the default url followed by the endpoint you want.
 
-If no 
+In this README you'll see examples provided of how to interract with the database via postman. We have not implemented arguments via the URL so everything is strictly through postman.
 
 ## Endpoint overview
 
@@ -92,10 +92,34 @@ URL: http://127.0.0.1:5000/customer
 
 Body:
 
+
+
 #### Transporter Endpoint (/transporter):
     method: GET, PUT
-    data: * FROM shipment
+    data: SELECT * FROM shipment
+##### Example Endpoint commands in Postman:
+Method: GET
 
+URL: http://127.0.0.1:5000/transporter
+
+Body(optional):
+
+    {
+    "shipmentNumber": "1"
+    }
+
+Method: PUT
+
+URL: http://127.0.0.1:5000/transporter
+
+Body:
+
+    {
+    "shipmentNumber": "2",
+    "state": "ready"
+    }
+
+This also changes the order's state to the same as the shipment, but doesnt reveal it as the transporter doesn't need to view the order itself.
 
 #### Employee Endpoint:
 ###### Customer rep (/customer_rep): 
