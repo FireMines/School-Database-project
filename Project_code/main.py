@@ -289,40 +289,50 @@ def customer_info():
                 return "Tried to create order with non existing customerID",400
 
     elif request.method == 'DELETE':
+
         data = request.get_json()
-        customer_id=data['customerID']
-        start_of_contract=data['startDate']
+        customer_id=data['customer_id']
+        orderNumber=data['orderNumber']
 
         cur=mysql.connection.cursor()
 
-        checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
-        checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
-        checkIfFranchise = cur.execute("SELECT * FROM `franchise` WHERE `customerID`=%s", (customer_id,))
-        checkIfValidID = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
+        order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
+        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
+        print(orderNumber_info)
+        if order_info:
+            if orderNumber_info > 0:
+                    deleteOrder = cur.execute("DELETE FROM `orders` WHERE `orders`.`orderNumber` = %s",(orderNumber,))
+                    mysql.connection.commit()
 
-        print("Skier: 1 Means exists, 0 means does not: ", checkIfTeamSkier)
-        print("Store: 1 Means exists, 0 means does not: ", checkIfIndivStore)
-        print("Franchise: 1 Means exists, 0 means does not: ", checkIfFranchise)
+                    deleteOrder = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
+
+                    if deleteOrder > 0:
+                        deleteOrder = cur.fetchall()
+            
+                    return jsonify(deleteOrder),201
+            else:
+                return "That ordernumber does not exists!",400
+        else:
+            return "CustomerID does not exist!",400
+
+        data = request.get_json()
+        customer_id=data['customer_id']
+        orderNumber=data['orderNumber']
+
+        cur=mysql.connection.cursor()
+
+        checkIfValidID = cur.execute("SELECT * FROM `order` WHERE `customer_id`=%s", (customer_id,))
 
         print(checkIfValidID)
         if checkIfValidID <= 0:
             return "No customer with that ID!"
 
-        if checkIfTeamSkier and checkIfIndivStore and checkIfFranchise < 0: 
-            return "Not in any of its mandatory tables"
 
-
-        if checkIfTeamSkier > 0:
-            #name=data['name']
-            #dob=data['dateOfBirth']
-            #club=data['club']
-            #annual_skies=data['annual_skies']
-
-            deleteTeamSkier = cur.execute("DELETE FROM `teamskier` WHERE `teamskier`.`customerID` = %s",(customer_id,))
-            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
+        if checkIfValidID > 0:
+            deleteOrder = cur.execute("DELETE FROM `orders` WHERE `orders`.`orderNumber` = %s",(orderNumber,))
             mysql.connection.commit()
 
-            customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
+            customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer_id))
 
             if customer_info > 0:
                 customer_info = cur.fetchall()
@@ -330,52 +340,10 @@ def customer_info():
             cur.close()
             return jsonify(customer_info),201
 
-
-        if checkIfIndivStore > 0:
-            #name=data['name']
-            #price=data['price']
-            #address=data['address']
-
-            deleteIndivStore = cur.execute("DELETE FROM `store` WHERE `store`.`customerID` = %s",(customer_id,))
-            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-        if checkIfFranchise > 0:
-            name=data['name']
-            #price=data['buying_price']
-            #address=data['shipping_address']
-
-            checkIfFranchise_store = cur.execute("SELECT * FROM `franchise_store` WHERE `name`=%s", (name,))
-
-            deleteFranchise = cur.execute("DELETE FROM `franchise` WHERE `franchise`.`customerID` = %s",(customer_id,))
-            change_startDate = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            
-            if checkIfFranchise_store > 0:
-                shipping=data['shipping']
-                deleteFranchise_Store = cur.execute("DELETE FROM `franchise_store` WHERE `franchise_store`.`name` = %s",(name,))
-
-            
-            mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
 
 
     else:
-        print("Method not implemented! Choose between GET, POST, PUT or DELETE instead")
+        return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"
     
     
 #                               #
