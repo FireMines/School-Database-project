@@ -5,11 +5,11 @@ Database project!
 
 ## Single-student project
 - Public endpoint:
-   - [ ] Retrieve list of ski types with model filter
+   - [x] Retrieve list of ski types with model filter
 - Storekeeper:
    - [ ] Create records newly produced skis
 - Customer:
-   - [ ] Retrieve a four week production plan summary
+   - [x] Retrieve a four week production plan summary
    - [ ] Delete a given order
 - Customer rep:
    - [ ] Retrieve orders with status filter set to new
@@ -19,14 +19,14 @@ Database project!
 - Public endpoint:
    - [ ] Add ski size filter to the Retrieve operations
 - Planner:
-   - [ ] Create new production plans
+   - [x] Create new production plans
 - Customer endpoint:
    - [ ] Create new orders
 - Customer rep:
    - [ ] Adding filter for status = skis-available
    Retrieve orders with status filter set to skis-available
 - Shipper endpoint:
-   - [ ] Create a transition record for the order from ready-for-shipping to shipped for a ready-for-shipping order
+   - [x] Create a transition record for the order from ready-for-shipping to shipped for a ready-for-shipping order
 
 ## Triple-student project extra:
 - Customer endpoint:
