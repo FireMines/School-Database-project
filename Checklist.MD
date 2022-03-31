@@ -1,7 +1,4 @@
-# Group 24 Project
-
-Database project!
-
+# Group 17 Project
 
 ## Single-student project
 - Public endpoint:
