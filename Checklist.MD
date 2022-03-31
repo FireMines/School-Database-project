@@ -6,7 +6,7 @@
 - Storekeeper:
    - [ ] Create records newly produced skis
 - Customer:
-   - [x] Retrieve a four week production plan summary
+   - [ ] Retrieve a four week production plan summary
    - [x] Delete a given order
 - Customer rep:
    - [ ] Retrieve orders with status filter set to new
@@ -18,7 +18,7 @@
 - Planner:
    - [x] Create new production plans
 - Customer endpoint:
-   - [ ] Create new orders
+   - [x] Create new orders
 - Customer rep:
    - [ ] Adding filter for status = skis-available
    Retrieve orders with status filter set to skis-available
@@ -27,8 +27,8 @@
 
 ## Triple-student project extra:
 - Customer endpoint:
-   - [ ] Retrieve orders with since filter
-   - [ ] Retrieve a specific order
+   - [x] Retrieve orders with since filter
+   - [x] Retrieve a specific order
    - [ ] Creating a new order for the unassigned items in a current order, making the current one ready-for-shipping
 - Storekeeper:
    - [ ] Retrieve orders
