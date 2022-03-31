@@ -25,7 +25,7 @@ If no
 
 #### Public Endpoint (/skiType):
     methods: GET
-    data: model, type, size, description, historical, url FROM ski_type
+    data: SELECT * FROM ski
 
 
 #### Customer Endpoint (/customer):
@@ -100,12 +100,133 @@ Body:
 #### Employee Endpoint:
 ###### Customer rep (/customer_rep): 
     methods: GET, PUT, POST
-    data: * FROM ski_order, * FROM shipment
+    data: SELECT * FROM order, SELECT * FROM shipment
+
+##### Example Endpoint commands in Postman:
+Method: GET
+
+URL: http://127.0.0.1:5000/customer_rep
+
+Body(optional):
+
+    {
+    "state": "available"
+    }
+
+Method: PUT
+
+URL: http://127.0.0.1:5000/customer_rep
+
+Body:
+
+    {
+    "order_number": "100100"
+    }
+
+Method: POST
+
+URL: http://127.0.0.1:5000/customer_rep
+
+Body:
+
+    {
+    "shipment_number":"2",
+    "order_number": "100100",
+    "transporterID":"1",
+    "address":"FC Habbo",
+    "date": "2022-05-26 16:03:00"
+    }
+
+Note: order_number and transporterID needs to be existing within the database for this body to work
 
 ###### Storekeeper (/storekeeper):
     methods: GET, POST, PUT
-    data: * FROM ski_order, * FROM product
+    data: SELECT * FROM orders WHERE state=available, SELECT * FROM product, SELECT * FROM ski_type
+
+Method: GET
+
+URL: http://127.0.0.1:5000/storekeeper
+
+Method: PUT
+
+URL: http://127.0.0.1:5000/storekeeper
+
+Body:
+
+    {
+    "order_number":"100100"
+    }
+
+Method: POST
+
+URL: http://127.0.0.1:5000/storekeeper
+
+Body(Option 1):
+
+    {
+    "typeID":"4", 
+    "type":"classic",
+    "model":"active",
+    "decription":"These are skies",
+    "image":"None",
+    "msrp":"200,50",
+    "productID":"10",
+    "length":"147",
+    "weight":"20-30"
+    }
+
+Body(Option 2):
+
+    {
+    "typeID":"4", 
+    "productID":"10",
+    "length":"147",
+    "weight":"20-30"
+    }
+
+Note: for the body option 2 the database need to have a already existing ski_type with the typeID provided
 
 ###### Production Planner:
-    methods: POST
-    data: * FROM production_plan
+    methods: GET, POST
+    data: SELECT * FROM production_plan, SELECT * FROM productionPlanReference
+
+Method: GET
+
+URL: http://127.0.0.1:5000/production_planner
+
+Body(Optional):
+
+    {
+    "planID":"1"
+    }
+
+Note: If the get request is not followed with a specific planID it will show a summary of all plans in the database, however when searching for a specific plan it will git the productionPlan references to that plan as well.
+
+Method: POST
+
+URL: http://127.0.0.1:5000/production_planner
+
+Body:
+
+    {
+    "planID":"2",
+    "employeeID":"1",
+    "startDate":"2022-02-01",
+    "endDate":"2022-02-28",
+    "planReferences":[
+        {
+            "referenceID":"4",
+            "productID":"2",
+            "quantity":"10"
+        },
+        {
+            "referenceID":"5",
+            "productID":"1",
+            "quantity":"5"
+        }
+    ]
+    }
+
+Note: EmployeeID need to be an existing employee in the database
+
+
