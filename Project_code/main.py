@@ -315,33 +315,6 @@ def customer_info():
         else:
             return "CustomerID does not exist!",400
 
-        data = request.get_json()
-        customer_id=data['customer_id']
-        orderNumber=data['orderNumber']
-
-        cur=mysql.connection.cursor()
-
-        checkIfValidID = cur.execute("SELECT * FROM `order` WHERE `customer_id`=%s", (customer_id,))
-
-        print(checkIfValidID)
-        if checkIfValidID <= 0:
-            return "No customer with that ID!"
-
-
-        if checkIfValidID > 0:
-            deleteOrder = cur.execute("DELETE FROM `orders` WHERE `orders`.`orderNumber` = %s",(orderNumber,))
-            mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer_id))
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-
-
     else:
         return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"
     
