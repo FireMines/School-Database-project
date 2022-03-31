@@ -6,7 +6,7 @@ This is the work of group 17
 To run the database project, you got to have some things installed on your computer. 
 What you need is:
 * Xampp Control Panel
-* Anaconda Python
+* Anaconda Python (the newest version of python is included in Anaconda)
 * Postman
 * IDE Environment, we are using Visual Studio Code
 * Cloned repo to your computer
