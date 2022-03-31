@@ -41,11 +41,19 @@ def get_skitype_info():
 @app.route('/transporter',methods=['GET', 'PUT'])
 def get_transporter_info():
     
+    #           #
+    #   GET     #
+    #           #
     if request.method == 'GET':
+        data = request.get_json()
         
         cur=mysql.connection.cursor()
+        if data:
+            shipmentNumber=data['shipmentNumber']
 
-        transporter_info= cur.execute("SELECT * FROM `shipment`")
+            transporter_info= cur.execute("SELECT * FROM `shipment` WHERE 'shipmentNumber'=%s",(shipmentNumber,))
+        else:
+            transporter_info= cur.execute("SELECT * FROM `shipment`")
 
         if transporter_info >0:
             transporter_info = cur.fetchall()
@@ -53,24 +61,26 @@ def get_transporter_info():
         cur.close()
         return jsonify(transporter_info),201
     
+    #           #
+    #   PUT     #
+    #           #
     elif request.method == 'PUT':
         data = request.get_json()
         shipmentNumber=data['shipmentNumber']
-        transport_id=data['transporterID']
         status=data['state']
 
         cur=mysql.connection.cursor()
 
-        change_order_state = cur.execute("UPDATE `shipment` SET `state`=%s WHERE `shipmentNumber`=%s AND `transporterID`=%s",(status,shipmentNumber,transport_id,))
+        change_shipment_state = cur.execute("UPDATE `shipment` INNER JOIN `orders` ON `shipment`.`orderNumber`=`orders`.`orderNumber` SET `shipment`.`state`=%s, `orders`.`state`=%s WHERE `shipment`.`shipmentNumber`=%s; ",(status,status,shipmentNumber,))
         mysql.connection.commit()
 
-        account_info= cur.execute("SELECT * FROM `shipment`")
-
-        if account_info >0:
-            account_info = cur.fetchall()
-
+        transporter_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`= %s",(shipmentNumber,))
+     
+        if transporter_info >0:
+            transporter_info = cur.fetchall()
+        
         cur.close()
-        return jsonify(account_info),201
+        return jsonify(transporter_info),201
     
     
     else:
