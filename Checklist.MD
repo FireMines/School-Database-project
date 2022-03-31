@@ -7,7 +7,7 @@
    - [ ] Create records newly produced skis
 - Customer:
    - [x] Retrieve a four week production plan summary
-   - [ ] Delete a given order
+   - [x] Delete a given order
 - Customer rep:
    - [ ] Retrieve orders with status filter set to new
    - [ ] Change the order state from new to open for an unassigned order
