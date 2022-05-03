@@ -35,6 +35,7 @@ def transporter(): return transporter_endpoint.get_transporter_info(mysql)
 #                       #
 @app.route('/customer',methods=['GET', 'POST', 'PUT', 'DELETE'])
 def customer(): return customer_endpoint.customer_info(mysql)  
+
     
 #                               #
 #   Customer rep endpoints      #
