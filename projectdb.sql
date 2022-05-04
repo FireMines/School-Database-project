@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2022 at 12:22 AM
+-- Generation Time: May 04, 2022 at 04:24 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.0.14
 
@@ -122,11 +122,30 @@ INSERT INTO `franchise_store` (`name`, `shipping`) VALUES
 CREATE TABLE `orders` (
   `orderNumber` int(20) NOT NULL,
   `customer_id` int(20) NOT NULL,
-  `quantity` int(2) NOT NULL,
   `totalPrice` decimal(15,2) NOT NULL,
   `state` enum('new','open','available','cancelled','ready','shipped') COLLATE utf8_danish_ci NOT NULL,
-  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `productID` int(20) NOT NULL
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`orderNumber`, `customer_id`, `totalPrice`, `state`, `date`) VALUES
+(1, 1, '5400.00', 'ready', '2022-03-31 13:13:26'),
+(2, 2, '4000.00', 'ready', '2022-03-31 14:36:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_reference_skis`
+--
+
+CREATE TABLE `order_reference_skis` (
+  `orderNumber` int(20) NOT NULL,
+  `productID` int(20) NOT NULL,
+  `quantity` int(20) NOT NULL,
+  `referenceID` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 -- --------------------------------------------------------
@@ -185,6 +204,14 @@ CREATE TABLE `shipment` (
   `pickUpDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `state` enum('ready','shipped') COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
+
+--
+-- Dumping data for table `shipment`
+--
+
+INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `shippingAddress`, `pickUpDate`, `state`) VALUES
+(1, 1, 1, 'this is the adress', '2022-03-31 13:13:52', 'shipped'),
+(2, 2, 1, 'new adress', '2022-03-31 13:50:53', 'ready');
 
 -- --------------------------------------------------------
 
@@ -320,8 +347,15 @@ ALTER TABLE `franchise_store`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`orderNumber`),
-  ADD KEY `Orders_Customer_FK` (`customer_id`),
-  ADD KEY `Orders_Ski_FK` (`productID`);
+  ADD KEY `Orders_Customer_FK` (`customer_id`);
+
+--
+-- Indexes for table `order_reference_skis`
+--
+ALTER TABLE `order_reference_skis`
+  ADD PRIMARY KEY (`referenceID`),
+  ADD KEY `order_reference_skis_ibfk_1` (`orderNumber`),
+  ADD KEY `order_reference_skis_ibfk_2` (`productID`);
 
 --
 -- Indexes for table `productionplan`
@@ -404,7 +438,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `shipment`
 --
 ALTER TABLE `shipment`
-  MODIFY `shipmentNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `shipmentNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `ski`
@@ -451,8 +485,14 @@ ALTER TABLE `franchise`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `Orders_Customer_FK` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customerID`),
-  ADD CONSTRAINT `Orders_Ski_FK` FOREIGN KEY (`productID`) REFERENCES `ski` (`productID`);
+  ADD CONSTRAINT `Orders_Customer_FK` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customerID`);
+
+--
+-- Constraints for table `order_reference_skis`
+--
+ALTER TABLE `order_reference_skis`
+  ADD CONSTRAINT `order_reference_skis_ibfk_1` FOREIGN KEY (`orderNumber`) REFERENCES `orders` (`orderNumber`),
+  ADD CONSTRAINT `order_reference_skis_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `ski` (`productID`);
 
 --
 -- Constraints for table `productionplan`
