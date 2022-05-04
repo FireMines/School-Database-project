@@ -1,14 +1,15 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
+import consts
 
 #                       #
 #   Customer endpoint   #
 #                       #
-def customer_info(mysql):
+def customer_info():
     
     if request.method == 'GET':
         
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         customer_info= cur.execute("SELECT * FROM `customer`")
 
@@ -23,7 +24,7 @@ def customer_info(mysql):
         customer_id=data['customerID']
         start_of_contract=data['startDate']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
         checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
@@ -51,7 +52,7 @@ def customer_info(mysql):
 
             change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
             updateTeamSkier = cur.execute("UPDATE `teamskier` SET `name`=%s, `dateOfBirth`=%s, `club`=%s, `annual_skies`=%s WHERE `customerID`=%s",(name,dob,club,annual_skies,customer_id,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
 
@@ -69,7 +70,7 @@ def customer_info(mysql):
 
             change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
             updateIndivStore = cur.execute("UPDATE `store` SET `name`=%s, `price`=%s, `address`=%s WHERE `customerID`=%s",(name,price,address,customer_id,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
 
@@ -94,7 +95,7 @@ def customer_info(mysql):
                 updateFranchise_Store = cur.execute("UPDATE `franchise_store` SET `shipping`=%s WHERE `customerID`=%s",(shipping,customer_id,))
 
             
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
 
@@ -114,7 +115,7 @@ def customer_info(mysql):
         annual_skies=data['annual_skies']
         startDate=data['startDate']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         customer_info = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
         team_skier_info = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
@@ -123,7 +124,7 @@ def customer_info(mysql):
 
         if customer_info <= 0:
             add_customer_info = cur.execute("INSERT INTO `customer` (`customerID`, `startDate`) VALUES (%s,%s)", (customer_id,startDate))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             add_customer_info = cur.execute("SELECT * FROM `customer`")
 
@@ -135,7 +136,7 @@ def customer_info(mysql):
 
             if team_skier_info <= 0:
                 change_teamskier_info = cur.execute("INSERT INTO `teamskier` (`customerID`, `name`, `dateOfBirth`, `club`, `annual_skies`) VALUES (%s,%s,%s,%s,%s)", (customer_id, name, dob, club, annual_skies))
-                mysql.connection.commit()
+                consts.mysql.connection.commit()
 
                 team_skier_info = cur.execute("SELECT * FROM `teamskier`")
 
@@ -156,7 +157,7 @@ def customer_info(mysql):
         customer_id=data['customerID']
         start_of_contract=data['startDate']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
         checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
@@ -183,7 +184,7 @@ def customer_info(mysql):
 
             deleteTeamSkier = cur.execute("DELETE FROM `teamskier` WHERE `teamskier`.`customerID` = %s",(customer_id,))
             deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
 
@@ -201,7 +202,7 @@ def customer_info(mysql):
 
             deleteIndivStore = cur.execute("DELETE FROM `store` WHERE `store`.`customerID` = %s",(customer_id,))
             deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
 
@@ -226,7 +227,7 @@ def customer_info(mysql):
                 deleteFranchise_Store = cur.execute("DELETE FROM `franchise_store` WHERE `franchise_store`.`name` = %s",(name,))
 
             
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
 

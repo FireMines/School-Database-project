@@ -1,10 +1,12 @@
 from asyncio.windows_events import NULL
+import http
 from flask import request, jsonify
+import consts
 
 #                               #
 #   Customer rep endpoints      #
 #                               #
-def customer_rep(mysql):
+def customer_rep():
 
     #           #
     #   GET     #
@@ -12,7 +14,7 @@ def customer_rep(mysql):
     if request.method == 'GET':
         data=request.get_json()
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         if data:
             state= data['state']
@@ -24,7 +26,7 @@ def customer_rep(mysql):
             order_info = cur.fetchall()
 
         cur.close()
-        return jsonify(order_info),201
+        return jsonify(order_info),http.HTTPStatus.OK
 
     #           #
     #   PUT     #
@@ -33,7 +35,7 @@ def customer_rep(mysql):
         data = request.get_json()
         order_number=data['order_number']
     
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state` IN ('new', 'open')", (order_number,))
 
@@ -41,10 +43,10 @@ def customer_rep(mysql):
             state_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state`='new'", (order_number,))
             if state_info >0:
                 change_state = cur.execute("UPDATE `orders` SET `state`='open' WHERE `orderNumber`=%s",(order_number,))
-                mysql.connection.commit()
+                consts.mysql.connection.commit()
             else: 
                 change_state = cur.execute("UPDATE `orders` SET `state`='available' WHERE `orderNumber`=%s",(order_number,))
-                mysql.connection.commit()
+                consts.mysql.connection.commit()
 
             order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (order_number,))
 
@@ -52,11 +54,11 @@ def customer_rep(mysql):
                 order_info = cur.fetchall()
 
             cur.close()
-            return jsonify(order_info),201
+            return jsonify(order_info),http.HTTPStatus.OK
 
         else:
             cur.close()
-            return "No orders with that order number that are new or open", 400
+            return "No orders with that order number that are new or open", http.HTTPStatus.BAD_REQUEST
 
     #           #
     #   POST    #
@@ -69,7 +71,7 @@ def customer_rep(mysql):
         shipping_address=data['address']
         pick_up_date=data['date']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         shipment_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number))
         order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (order_number,))
@@ -77,7 +79,7 @@ def customer_rep(mysql):
 
         if shipment_info <=0 and (order_info and transporter_info >0):
             change_state = cur.execute("INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `shippingAddress`, `pickUpDate`, `state`) VALUES (%s, %s, %s, %s, %s, 'ready')", (shipment_number, order_number, transporter_id, shipping_address, pick_up_date,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             shipments_info= cur.execute("SELECT * FROM `shipment` WHERE `shipmentNumber`=%s", (shipment_number,))
 

@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2022 at 04:24 PM
--- Server version: 10.4.22-MariaDB
+-- Generation Time: 04. Mai, 2022 19:43 PM
+-- Tjener-versjon: 10.4.22-MariaDB
 -- PHP Version: 8.0.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -28,20 +28,21 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `authenticator` (
-  `token` varchar(100) COLLATE utf8_danish_ci NOT NULL,
-  `role` varchar(50) COLLATE utf8_danish_ci NOT NULL
+  `Username` varchar(200) COLLATE utf8_danish_ci NOT NULL,
+  `Hashedpassword` varchar(200) COLLATE utf8_danish_ci NOT NULL,
+  `role` enum('Transporter','Customer','Customer_rep','Storekeeper','Production_planner') COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
 -- Dataark for tabell `authenticator`
 --
 
-INSERT INTO `authenticator` (`token`, `role`) VALUES
-('thisisaproductionplannertoken', 'ProductionPlanner'),
-('thisisacustomerreptoken', 'CustomerRep'),
-('thisisatransportertoken', 'Transporter'),
-('thisisacustomertoken', 'customer'),
-('thisisastorekeepertoken', 'Storekeeper');
+INSERT INTO `authenticator` (`Username`, `Hashedpassword`, `role`) VALUES
+('User1', 'password1', 'Transporter'),
+('User2', 'password2', 'Customer'),
+('User3', 'password3', 'Customer_rep'),
+('User4', 'password4', 'Storekeeper'),
+('User5', 'password5', 'Production_planner');
 
 -- --------------------------------------------------------
 
@@ -60,8 +61,7 @@ CREATE TABLE `customer` (
 
 INSERT INTO `customer` (`customerID`, `startDate`) VALUES
 (1, '2022-03-26'),
-(2, '2022-03-26'),
-(3, '2017-09-17');
+(2, '2022-03-26');
 
 -- --------------------------------------------------------
 
@@ -96,14 +96,6 @@ CREATE TABLE `franchise` (
   `Franchise` varchar(50) COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
---
--- Dataark for tabell `franchise`
---
-
-INSERT INTO `franchise` (`customerID`, `name`, `buying_price`, `shipping_address`, `Franchise`) VALUES
-(1, 'Habbo ', '9000.00', 'Habbo Club Street 17', 'Habbo Gjøvik'),
-(2, 'XXL', '12000.00', 'XXL Street 5', 'XXL Oslo');
-
 -- --------------------------------------------------------
 
 --
@@ -120,9 +112,7 @@ CREATE TABLE `franchise_store` (
 --
 
 INSERT INTO `franchise_store` (`name`, `shipping`) VALUES
-('Habbo Gjøvik', '37'),
-('Habbo Hamar', '72'),
-('XXL Oslo', '42');
+('Habbos nye brusmaskin', '37');
 
 -- --------------------------------------------------------
 
@@ -133,30 +123,11 @@ INSERT INTO `franchise_store` (`name`, `shipping`) VALUES
 CREATE TABLE `orders` (
   `orderNumber` int(20) NOT NULL,
   `customer_id` int(20) NOT NULL,
+  `quantity` int(2) NOT NULL,
   `totalPrice` decimal(15,2) NOT NULL,
   `state` enum('new','open','available','cancelled','ready','shipped') COLLATE utf8_danish_ci NOT NULL,
-  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`orderNumber`, `customer_id`, `totalPrice`, `state`, `date`) VALUES
-(1, 1, '5400.00', 'ready', '2022-03-31 13:13:26'),
-(2, 2, '4000.00', 'ready', '2022-03-31 14:36:55');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `order_reference_skis`
---
-
-CREATE TABLE `order_reference_skis` (
-  `orderNumber` int(20) NOT NULL,
-  `productID` int(20) NOT NULL,
-  `quantity` int(20) NOT NULL,
-  `referenceID` int(20) NOT NULL
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `productID` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
@@ -164,9 +135,8 @@ CREATE TABLE `order_reference_skis` (
 --
 
 INSERT INTO `orders` (`orderNumber`, `customer_id`, `quantity`, `totalPrice`, `state`, `date`, `productID`) VALUES
-(10, 1, 20, '6000.00', 'new', '2022-03-31 20:01:37', 2),
-(11, 1, 60, '20000.00', 'available', '2022-03-31 20:02:04', 2),
-(22, 2, 12, '3000.00', 'ready', '2022-03-31 20:02:35', 3);
+(100100, 1, 10, '1010.10', 'available', '2022-05-03 17:14:17', 2),
+(200200, 2, 2, '200.20', 'new', '2018-05-02 22:00:00', 2);
 
 -- --------------------------------------------------------
 
@@ -186,7 +156,8 @@ CREATE TABLE `productionplan` (
 --
 
 INSERT INTO `productionplan` (`employeeNumber`, `planID`, `startDate`, `endDate`) VALUES
-(1, 1, '2022-03-30', '2022-07-30');
+(1, 1, '2022-03-30', '2022-07-30'),
+(1, 2, '2022-02-01', '2022-02-28');
 
 -- --------------------------------------------------------
 
@@ -208,7 +179,9 @@ CREATE TABLE `productionplanreference` (
 INSERT INTO `productionplanreference` (`planID`, `productID`, `Quantity`, `ReferenceID`) VALUES
 (1, 1, 13, 1),
 (1, 2, 33, 2),
-(1, 3, 5, 3);
+(1, 3, 5, 3),
+(2, 2, 10, 4),
+(2, 1, 5, 5);
 
 -- --------------------------------------------------------
 
@@ -226,12 +199,11 @@ CREATE TABLE `shipment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
 --
--- Dumping data for table `shipment`
+-- Dataark for tabell `shipment`
 --
 
 INSERT INTO `shipment` (`shipmentNumber`, `orderNumber`, `transporterID`, `shippingAddress`, `pickUpDate`, `state`) VALUES
-(1, 1, 1, 'this is the adress', '2022-03-31 13:13:52', 'shipped'),
-(2, 2, 1, 'new adress', '2022-03-31 13:50:53', 'ready');
+(1, 100100, 1, 'Address', '2022-03-31 14:25:43', 'shipped');
 
 -- --------------------------------------------------------
 
@@ -254,7 +226,8 @@ CREATE TABLE `ski` (
 INSERT INTO `ski` (`productID`, `typeID`, `length`, `weight`, `reserved`) VALUES
 (1, 1, '147', '50-60', NULL),
 (2, 2, '182', '50-60', NULL),
-(3, 1, '202', '60-70', NULL);
+(3, 1, '202', '60-70', NULL),
+(10, 4, '147', '20-30', NULL);
 
 -- --------------------------------------------------------
 
@@ -278,7 +251,8 @@ CREATE TABLE `skitype` (
 
 INSERT INTO `skitype` (`typeID`, `type`, `model`, `description`, `historical`, `url`, `msrp`) VALUES
 (1, 'classic', 'activePro', 'it looks cool and goes fast', 0, 'https://i1.adis.ws/s/madshus/madshus_2021_redline-3-skate-f2?w=340&qlt=100&fmt=webp&fmt.interlaced=true&bg=white&dpi=96', '7700.00'),
-(2, 'classic', 'racePro', 'it looks cool and goes fast but green', 0, 'https://i1.adis.ws/s/madshus/madshus_2122_redline-3-skate-green-ltd?w=340&qlt=100&fmt=webp&fmt.interlaced=true&bg=white&dpi=96', '3600.00');
+(2, 'classic', 'racePro', 'it looks cool and goes fast but green', 0, 'https://i1.adis.ws/s/madshus/madshus_2122_redline-3-skate-green-ltd?w=340&qlt=100&fmt=webp&fmt.interlaced=true&bg=white&dpi=96', '3600.00'),
+(4, 'classic', 'active', 'These are skies', NULL, 'None', '200.00');
 
 -- --------------------------------------------------------
 
@@ -292,13 +266,6 @@ CREATE TABLE `store` (
   `price` decimal(15,2) NOT NULL,
   `address` varchar(30) COLLATE utf8_danish_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
-
---
--- Dataark for tabell `store`
---
-
-INSERT INTO `store` (`name`, `customerID`, `price`, `address`) VALUES
-('Gjøviks Local Gymstore', 1, '6000.00', 'Exercise Street 2');
 
 -- --------------------------------------------------------
 
@@ -345,6 +312,12 @@ INSERT INTO `transporter` (`transporterID`, `name`) VALUES
 --
 
 --
+-- Indexes for table `authenticator`
+--
+ALTER TABLE `authenticator`
+  ADD PRIMARY KEY (`Username`);
+
+--
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
@@ -374,15 +347,8 @@ ALTER TABLE `franchise_store`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`orderNumber`),
-  ADD KEY `Orders_Customer_FK` (`customer_id`);
-
---
--- Indexes for table `order_reference_skis`
---
-ALTER TABLE `order_reference_skis`
-  ADD PRIMARY KEY (`referenceID`),
-  ADD KEY `order_reference_skis_ibfk_1` (`orderNumber`),
-  ADD KEY `order_reference_skis_ibfk_2` (`productID`);
+  ADD KEY `Orders_Customer_FK` (`customer_id`),
+  ADD KEY `Orders_Ski_FK` (`productID`);
 
 --
 -- Indexes for table `productionplan`
@@ -447,7 +413,7 @@ ALTER TABLE `transporter`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `employee`
@@ -465,25 +431,25 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `shipment`
 --
 ALTER TABLE `shipment`
-  MODIFY `shipmentNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `shipmentNumber` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `ski`
 --
 ALTER TABLE `ski`
-  MODIFY `productID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `productID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `skitype`
 --
 ALTER TABLE `skitype`
-  MODIFY `typeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `typeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `store`
 --
 ALTER TABLE `store`
-  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `customerID` int(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `teamskier`
@@ -512,14 +478,8 @@ ALTER TABLE `franchise`
 -- Begrensninger for tabell `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `Orders_Customer_FK` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customerID`);
-
---
--- Constraints for table `order_reference_skis`
---
-ALTER TABLE `order_reference_skis`
-  ADD CONSTRAINT `order_reference_skis_ibfk_1` FOREIGN KEY (`orderNumber`) REFERENCES `orders` (`orderNumber`),
-  ADD CONSTRAINT `order_reference_skis_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `ski` (`productID`);
+  ADD CONSTRAINT `Orders_Customer_FK` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customerID`),
+  ADD CONSTRAINT `Orders_Ski_FK` FOREIGN KEY (`productID`) REFERENCES `ski` (`productID`);
 
 --
 -- Begrensninger for tabell `productionplan`

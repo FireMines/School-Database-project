@@ -1,14 +1,15 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
+import consts
 
 #                                   #
 #   transporter/shipping endpoint   #
 #                                   #
-def get_transporter_info(mysql):
+def get_transporter_info():
     
     if request.method == 'GET':
         
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         transporter_info= cur.execute("SELECT * FROM `shipment`")
 
@@ -24,10 +25,10 @@ def get_transporter_info(mysql):
         transport_id=data['transporterID']
         status=data['state']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         change_order_state = cur.execute("UPDATE `shipment` SET `state`=%s WHERE `shipmentNumber`=%s AND `transporterID`=%s",(status,shipmentNumber,transport_id,))
-        mysql.connection.commit()
+        consts.mysql.connection.commit()
 
         account_info= cur.execute("SELECT * FROM `shipment`")
 

@@ -1,15 +1,16 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
+import consts
 
 #                       #
 #   Public Endpoint     #
 #                       #
-def get_skitype_info(mysql):
+def get_skitype_info():
     
     if request.method == 'GET':
         data=request.get_json()
         
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         if data:
             model_filter=data['model']

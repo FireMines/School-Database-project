@@ -1,11 +1,12 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
+import consts
 
 
 #                                   #
 #   Production planner endpoints    #
 #                                   #
-def production_planner(mysql):
+def production_planner():
 
     #           #
     #   GET     #
@@ -13,7 +14,7 @@ def production_planner(mysql):
     if request.method == 'GET':
         data=request.get_json()
         
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         if data:
             plan_id =data['planID']
@@ -38,14 +39,14 @@ def production_planner(mysql):
         end_date=data['endDate']
         referneces=data['planReferences']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         plan_info= cur.execute("SELECT * FROM `productionplan` WHERE `planID`=%s", (plan_id,))
 
         if plan_info <=0:
             
             change_state = cur.execute("INSERT INTO `productionplan` (`employeeNumber`, `planID`, `startDate`, `endDate`) VALUES (%s,%s,%s,%s)", (employee_id, plan_id, start_date, end_date,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             for ref in referneces:
                 ref_id=ref['referenceID']
@@ -53,7 +54,7 @@ def production_planner(mysql):
                 quantity=ref['quantity']
 
                 change_state== cur.execute("INSERT INTO `productionplanreference` (`planID`, `productID`, `ReferenceID`, `Quantity`) VALUES (%s,%s,%s,%s)", (plan_id, product_id, ref_id, quantity,))
-                mysql.connection.commit()
+                consts.mysql.connection.commit()
 
             plan_info= cur.execute("SELECT * FROM `productionplanreference` INNER JOIN `productionplan` ON `productionplanreference`.`planID`=`productionplan`.`planID` WHERE `productionplan`.`planID`=%s", (plan_id,))
 

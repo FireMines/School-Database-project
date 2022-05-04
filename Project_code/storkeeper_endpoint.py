@@ -1,17 +1,18 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
+import consts
 
 #                               #
 #   Storekeeper endpoints       #
 #                               #
-def storekeeper(mysql):
+def storekeeper():
 
     #           #
     #   GET     #
     #           #
     if request.method == 'GET':
         
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         order_info= cur.execute("SELECT * FROM `orders` WHERE `state` = 'available'")
 
@@ -28,13 +29,13 @@ def storekeeper(mysql):
         data = request.get_json()
         order_number=data['order_number']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         order_info=cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `state`='available'",(order_number,))
 
         if order_info >0:
             change_state = cur.execute("UPDATE `orders` SET `state`='ready' WHERE `orderNumber`=%s",(order_number,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             order_info= cur.execute("SELECT * FROM `orders`")
 
@@ -61,7 +62,7 @@ def storekeeper(mysql):
         ski_length=data['length']
         ski_weight=data['weight']
 
-        cur=mysql.connection.cursor()
+        cur=consts.mysql.connection.cursor()
 
         product_info= cur.execute("SELECT * FROM `ski` WHERE `productID`=%s", (product_id,))
 
@@ -76,10 +77,10 @@ def storekeeper(mysql):
                 image_url = data['image']
                 msrp = data['msrp']
                 change_state = cur.execute("INSERT INTO `skitype`(`typeID`, `type`, `model`, `description`, `url`, `msrp`) VALUES (%s,%s,%s,%s,%s,%s)", (type_id, ski_type, model_type, ski_decription, image_url, msrp))
-                mysql.connection.commit()
+                consts.mysql.connection.commit()
 
             change_state = cur.execute("INSERT INTO `ski`(`productID`, `typeID`, `length`, `weight`) VALUES (%s, %s, %s, %s)", (product_id, type_id, ski_length, ski_weight,))
-            mysql.connection.commit()
+            consts.mysql.connection.commit()
 
             shipments_info= cur.execute("SELECT * FROM `ski`")
 
