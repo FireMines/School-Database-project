@@ -6,7 +6,7 @@ This is the work of group 17
 To run the database project, you got to have some things installed on your computer. 
 What you need is:
 * Xampp Control Panel
-* Anaconda Python
+* Anaconda Python (the newest version of python is included in Anaconda)
 * Postman
 * IDE Environment, we are using Visual Studio Code
 * Cloned repo to your computer
@@ -30,68 +30,64 @@ In this README you'll see examples provided of how to interract with the databas
 
 #### Customer Endpoint (/customer):
     method: GET, POST, PUT, DELETE
-    data: * FROM ski_order, start, end FROM production_plan
+    data: SELECT * FROM `orders`
 
 ##### Example Endpoint commands in Postman:
-Method: Get
-
-URL: http://127.0.0.1:5000/customer
-
-
-Method: Post
+Method: **Get**
 
 URL: http://127.0.0.1:5000/customer
 
 Body:
 
     {
-    "customerID": 1,
-    "name": "Habbo Hotel",
-    "dateOfBirth": "2014-03-05 12:23:34",
-    "club": "FC Habbo Elite",
-    "annual_skies": 5
+    "customer_id": 1,
+    "orderNumber": 5
     }
 
-Method: PUT
+    {
+    "customer_id": 1
+    }
+
+    {
+    "customer_id": 1,
+    "orderNumber": 5,
+    "date": "2022-03-30 12:23:34"
+    }
+
+Method: **Post**
 
 URL: http://127.0.0.1:5000/customer
 
 Body:
 
-For teamskier:
-
     {
-    "customerID": 17,
-    "startDate": "2022-09-17 12:23:34",
-    "name": "Per Person",
-    "dateOfBirth": "2015-09-19 12:23:34",
-    "club": "Test Club",
-    "annual_skies": 50,
-    }
-For store:
-
-    {  
-    "customerID": 2,
-    "name": "Hei Hei",
-    "buying_price": 420,
-    "shipping_address": "Habbos havn"
-    }
-For franchise:
-
-    {
-    "customerID": 10,
-    "startDate": "2022-09-19 12:23:34",
-    "name": "Hei Hei",
-    "buying_price": 420,
-    "shipping_address": "Habbos havn"
+    "customer_id": 1,
+    "orderNumber": 20,
+    "quantity": 10,
+    "productID": 2
     }
 
-Method: DELETE
+Method: **PUT**
 
 URL: http://127.0.0.1:5000/customer
 
 Body:
 
+    {
+    "customer_id": 1,
+    "orderNumber": 12
+    }
+
+Method: **DELETE**
+
+URL: http://127.0.0.1:5000/customer
+
+Body:
+
+    {
+    "customer_id": 1,
+    "orderNumber": 15
+    }
 
 
 #### Transporter Endpoint (/transporter):
