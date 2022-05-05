@@ -8,10 +8,29 @@ import consts
 def customer_info():
     
     if request.method == 'GET':
-        
+        data=request.get_json()
+
         cur=consts.mysql.connection.cursor()
 
-        customer_info= cur.execute("SELECT * FROM `customer`")
+        if data:
+            customer=data['customer_id']
+            specific_order = data.get('orderNumber', "")
+            since_filter = data.get('date', "")
+
+            if since_filter != "":
+                if specific_order != "":# and state:
+                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `date`>=%s",(specific_order,since_filter,))
+                else: 
+                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s AND `date`>=%s",(customer,since_filter))
+            else:
+                if specific_order != "":# and state:
+                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s",(specific_order,))
+                else: 
+                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer,))
+
+
+        else:
+            return "Remember to add your customerID",400
 
         if customer_info >0:
             customer_info = cur.fetchall()
@@ -20,223 +39,108 @@ def customer_info():
         return jsonify(customer_info),201
 
     elif request.method == 'PUT':
+
         data = request.get_json()
-        customer_id=data['customerID']
-        start_of_contract=data['startDate']
+        customer_id=data['customer_id']
+        orderNumber=data['orderNumber']
 
         cur=consts.mysql.connection.cursor()
 
-        checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
-        checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
-        checkIfFranchise = cur.execute("SELECT * FROM `franchise` WHERE `customerID`=%s", (customer_id,))
-        checkIfValidID = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
+        order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
+        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
 
+        if order_info > 0:
+            if orderNumber_info > 0:
+                checkIfAlreadyCancelled = cur.execute("SELECT `state` FROM `orders` WHERE `orderNumber`=%s",(orderNumber,))
+                checkIfAlreadyCancelled = cur.fetchall()
+                print(checkIfAlreadyCancelled)
+                if checkIfAlreadyCancelled == 'cancelled': # Error here
+                    cancell_order_info = cur.execute("UPDATE `orders` SET `state`='cancelled' WHERE `customer_id`=%s AND `orderNumber`=%s", (customer_id,orderNumber,))
+                    consts.mysql.connection.commit()
 
-        print("Skier: 1 Means exists, 0 means does not: ", checkIfTeamSkier)
-        print("Store: 1 Means exists, 0 means does not: ", checkIfIndivStore)
-        print("Franchise: 1 Means exists, 0 means does not: ", checkIfFranchise)
+                    cancell_order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
 
-        print(checkIfValidID)
-        if checkIfValidID <= 0:
-            return "No customer with that ID!"
-
-        if checkIfTeamSkier and checkIfIndivStore and checkIfFranchise < 0: 
-            return "Not in any of its mandatory tables"
-
-
-        if checkIfTeamSkier > 0:
-            name=data['name']
-            dob=data['dateOfBirth']
-            club=data['club']
-            annual_skies=data['annual_skies']
-
-            change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
-            updateTeamSkier = cur.execute("UPDATE `teamskier` SET `name`=%s, `dateOfBirth`=%s, `club`=%s, `annual_skies`=%s WHERE `customerID`=%s",(name,dob,club,annual_skies,customer_id,))
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-
-        if checkIfIndivStore > 0:
-            name=data['name']
-            price=data['price']
-            address=data['address']
-
-            change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
-            updateIndivStore = cur.execute("UPDATE `store` SET `name`=%s, `price`=%s, `address`=%s WHERE `customerID`=%s",(name,price,address,customer_id,))
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-        if checkIfFranchise > 0:
-            name=data['name']
-            price=data['buying_price']
-            address=data['shipping_address']
-
-            checkIfFranchise_store = cur.execute("SELECT * FROM `franchise_store` WHERE `name`=%s", (name,))
-
-            change_startDate = cur.execute("UPDATE `customer` SET `startDate`=%s WHERE `customerID`=%s",(start_of_contract,customer_id,))
-            updateFranchise = cur.execute("UPDATE `franchise` SET `name`=%s, `buying_price`=%s, `shipping_address`=%s WHERE `customerID`=%s",(name,price,address,customer_id,))
+                    if cancell_order_info > 0:
+                        cancell_order_info = cur.fetchall()
             
-            if checkIfFranchise_store > 0:
-                shipping=data['shipping']
-                updateFranchise_Store = cur.execute("UPDATE `franchise_store` SET `shipping`=%s WHERE `customerID`=%s",(shipping,customer_id,))
+                    return jsonify(cancell_order_info),201
+                else:
+                    return "That order is already set to cancelled!",400
+            else:
+                return "That ordernumber already exists!",400
 
-            
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
+        else:
             cur.close()
-            return jsonify(customer_info),201
-
+            if order_info > 0:
+                return "Unable to add a order, customerID does not exists!", 400
+            else:
+                return "Tried to create order with non existing customerID",400
 
     elif request.method == 'POST':
         data = request.get_json()
-        customer_id=data['customerID']
-        name=data['name']
-        dob=data['dateOfBirth']
-        club=data['club']
-        annual_skies=data['annual_skies']
-        startDate=data['startDate']
+        customer_id=data['customer_id']
+        orderNumber=data['orderNumber']
+        quantity=data['quantity']
+        productID=data['productID']
 
         cur=consts.mysql.connection.cursor()
 
-        customer_info = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
-        team_skier_info = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
+        order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
+        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
 
+        if order_info > 0:
+            if not orderNumber_info:
+                checkProductID = cur.execute("SELECT * FROM `ski` WHERE `productID`=%s", (productID,))
+                if not checkProductID:
+                    return "ProductID which you are trying to order doesnt exist!"
 
-
-        if customer_info <= 0:
-            add_customer_info = cur.execute("INSERT INTO `customer` (`customerID`, `startDate`) VALUES (%s,%s)", (customer_id,startDate))
-            consts.mysql.connection.commit()
-
-            add_customer_info = cur.execute("SELECT * FROM `customer`")
-
-            if add_customer_info > 0:
-                add_customer_info = cur.fetchall()
-
-            #cur.close()
-            #return jsonify(add_customer_info), 201            
-
-            if team_skier_info <= 0:
-                change_teamskier_info = cur.execute("INSERT INTO `teamskier` (`customerID`, `name`, `dateOfBirth`, `club`, `annual_skies`) VALUES (%s,%s,%s,%s,%s)", (customer_id, name, dob, club, annual_skies))
+                add_order_info = cur.execute("INSERT INTO `orders` (`customer_id`, `orderNumber`, `quantity`, `state`, `productID`) VALUES (%s,%s,%s,'new',%s)", (customer_id,orderNumber,quantity,productID,))
                 consts.mysql.connection.commit()
 
-                team_skier_info = cur.execute("SELECT * FROM `teamskier`")
+                ski_info = cur.execute("SELECT * FROM `ski` WHERE `productID`=%s", (productID,))
 
-                if team_skier_info > 0:
-                    team_skier_info1 = cur.fetchall()
+                add_order_info = cur.execute("SELECT * FROM `orders`")
 
-                cur.close()
-                return jsonify(team_skier_info),201
-            else : 
-                cur.close()
-                return "Team Skier with that customerID already exists"
+                if add_order_info > 0:
+                    add_order_info = cur.fetchall()
+        
+                return jsonify(add_order_info),201
+            else:
+                return "That ordernumber already exists!",400
+
         else:
             cur.close()
-            return "Unable to add a customer, customerID already exists!"
+            if order_info > 0:
+                return "Unable to add a order, customerID does not exists!", 400
+            else:
+                return "Tried to create order with non existing customerID",400
 
     elif request.method == 'DELETE':
+
         data = request.get_json()
-        customer_id=data['customerID']
-        start_of_contract=data['startDate']
+        customer_id=data['customer_id']
+        orderNumber=data['orderNumber']
 
         cur=consts.mysql.connection.cursor()
 
-        checkIfTeamSkier = cur.execute("SELECT * FROM `teamskier` WHERE `customerID`=%s", (customer_id,))
-        checkIfIndivStore = cur.execute("SELECT * FROM `store` WHERE `customerID`=%s", (customer_id,))
-        checkIfFranchise = cur.execute("SELECT * FROM `franchise` WHERE `customerID`=%s", (customer_id,))
-        checkIfValidID = cur.execute("SELECT * FROM `customer` WHERE `customerID`=%s", (customer_id,))
+        order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
+        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
+        print(orderNumber_info)
+        if order_info:
+            if orderNumber_info > 0:
+                    deleteOrder = cur.execute("DELETE FROM `orders` WHERE `orders`.`orderNumber` = %s",(orderNumber,))
+                    consts.mysql.connection.commit()
 
-        print("Skier: 1 Means exists, 0 means does not: ", checkIfTeamSkier)
-        print("Store: 1 Means exists, 0 means does not: ", checkIfIndivStore)
-        print("Franchise: 1 Means exists, 0 means does not: ", checkIfFranchise)
+                    deleteOrder = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
 
-        print(checkIfValidID)
-        if checkIfValidID <= 0:
-            return "No customer with that ID!"
-
-        if checkIfTeamSkier and checkIfIndivStore and checkIfFranchise < 0: 
-            return "Not in any of its mandatory tables"
-
-
-        if checkIfTeamSkier > 0:
-            #name=data['name']
-            #dob=data['dateOfBirth']
-            #club=data['club']
-            #annual_skies=data['annual_skies']
-
-            deleteTeamSkier = cur.execute("DELETE FROM `teamskier` WHERE `teamskier`.`customerID` = %s",(customer_id,))
-            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `teamskier`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-
-        if checkIfIndivStore > 0:
-            #name=data['name']
-            #price=data['price']
-            #address=data['address']
-
-            deleteIndivStore = cur.execute("DELETE FROM `store` WHERE `store`.`customerID` = %s",(customer_id,))
-            deleteCustomer = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
-        if checkIfFranchise > 0:
-            name=data['name']
-            #price=data['buying_price']
-            #address=data['shipping_address']
-
-            checkIfFranchise_store = cur.execute("SELECT * FROM `franchise_store` WHERE `name`=%s", (name,))
-
-            deleteFranchise = cur.execute("DELETE FROM `franchise` WHERE `franchise`.`customerID` = %s",(customer_id,))
-            change_startDate = cur.execute("DELETE FROM `customer` WHERE `customer`.`customerID` = %s",(customer_id,))
+                    if deleteOrder > 0:
+                        deleteOrder = cur.fetchall()
             
-            if checkIfFranchise_store > 0:
-                shipping=data['shipping']
-                deleteFranchise_Store = cur.execute("DELETE FROM `franchise_store` WHERE `franchise_store`.`name` = %s",(name,))
-
-            
-            consts.mysql.connection.commit()
-
-            customer_info= cur.execute("SELECT * FROM (`customer`, `franchise`, `franchise_store`)")
-
-            if customer_info > 0:
-                customer_info = cur.fetchall()
-
-            cur.close()
-            return jsonify(customer_info),201
-
+                    return jsonify(deleteOrder),201
+            else:
+                return "That ordernumber does not exists!",400
+        else:
+            return "CustomerID does not exist!",400
 
     else:
-        print("Method not implemented! Choose between GET, POST, PUT or DELETE instead")
+        return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"
