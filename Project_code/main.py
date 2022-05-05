@@ -10,6 +10,7 @@ import storkeeper_endpoint
 import customerrep_endpoint
 import customer_endpoint
 import login_endpoint
+import register_endpoint
 import consts
 
 app = Flask(__name__)
@@ -82,6 +83,12 @@ def production_planner():
 #                      #
 @app.route('/login', methods=['POST'])
 def login(): return login_endpoint.loggingIn()
+
+#                         #
+#   register endpoints    #
+#                         #
+@app.route('/register', methods=['POST'])
+def register(): return register_endpoint.registering()
 
 if __name__ == '__main__':
     app.run(debug=True)

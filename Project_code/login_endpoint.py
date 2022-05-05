@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from hashlib import pbkdf2_hmac
 import http
 from flask import request, jsonify
 import consts
@@ -21,9 +22,10 @@ def loggingIn():
             cur.close()
 
             dbPassword = userData[1] # The hashedpassword stored in the db
-            consts.userRole = userData[2] # The role for the user
+            salt = userData[2]
+            consts.userRole = userData[3] # The role for the user
 
-        if dbPassword == hashPassword(password) and foundUser:
+        if dbPassword == hashPassword(password, salt).hex() and foundUser:
             return "Logged in as " + consts.userRole, http.HTTPStatus.ACCEPTED
         else: 
             return "password/username not recognized", http.HTTPStatus.UNAUTHORIZED
@@ -31,6 +33,9 @@ def loggingIn():
         return "Method not implemented", http.HTTPStatus.NOT_IMPLEMENTED
 
 
-def hashPassword(password):
-    hashedpass = password
-    return hashedpass
+def hashPassword(password, salt):
+    our_app_iters = 500_000
+    passwordAsByte = str.encode(password)
+    saltAsByte = str.encode(salt)
+    return pbkdf2_hmac('sha256',  passwordAsByte, saltAsByte, our_app_iters)
+

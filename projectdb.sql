@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 04. Mai, 2022 19:43 PM
+-- Generation Time: 05. Mai, 2022 17:31 PM
 -- Tjener-versjon: 10.4.22-MariaDB
 -- PHP Version: 8.0.14
 
@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `authenticator` (
   `Username` varchar(200) COLLATE utf8_danish_ci NOT NULL,
   `Hashedpassword` varchar(200) COLLATE utf8_danish_ci NOT NULL,
+  `salt` varchar(200) COLLATE utf8_danish_ci NOT NULL,
   `role` enum('Transporter','Customer','Customer_rep','Storekeeper','Production_planner') COLLATE utf8_danish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_danish_ci;
 
@@ -37,12 +38,12 @@ CREATE TABLE `authenticator` (
 -- Dataark for tabell `authenticator`
 --
 
-INSERT INTO `authenticator` (`Username`, `Hashedpassword`, `role`) VALUES
-('User1', 'password1', 'Transporter'),
-('User2', 'password2', 'Customer'),
-('User3', 'password3', 'Customer_rep'),
-('User4', 'password4', 'Storekeeper'),
-('User5', 'password5', 'Production_planner');
+INSERT INTO `authenticator` (`Username`, `Hashedpassword`, `salt`, `role`) VALUES
+('User1', 'f38cf1c69ed9b263868210a723962e9105f741fa07ed9bf707aa54e754cbed17', 'Ttm3CzoHhJ9CU77Y', 'Customer'),
+('User2', '82a40cc7b69f88a8f322b39072a48daa3edab81d84e88e9b0f17923008c1a283', 'uH7lo6vzThJ6WdMb', 'Transporter'),
+('User3', '342c2254259acd1994f927df8306fa3f8ce428cd2627b4ee6262f14bcd73f828', 'CTHEHvj7JmUtHkSc', 'Customer_rep'),
+('User4', '80aedceb173770e0401be6ce4cafb3bae60942c471a62348d8a97e36e624ab41', 'lfRCYM81sH0J7PyA', 'Storekeeper'),
+('User5', '238651697ab1b01c13180751c7839676e37a2883f045222603958f68f6b24394', 'a45GzfkRNagGv7KF', 'Production_planner');
 
 -- --------------------------------------------------------
 
@@ -310,12 +311,6 @@ INSERT INTO `transporter` (`transporterID`, `name`) VALUES
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `authenticator`
---
-ALTER TABLE `authenticator`
-  ADD PRIMARY KEY (`Username`);
 
 --
 -- Indexes for table `customer`
