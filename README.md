@@ -27,6 +27,31 @@ In this README you'll see examples provided of how to interract with the databas
     methods: GET
     data: SELECT * FROM ski
 
+##### Example Endpoint commands in Postman:
+Method: **Get**
+
+URL: http://127.0.0.1:5000/
+
+Body(Option1 filter by model only):
+
+    {
+    "model":"activePro"
+    }
+
+Body(Option2 filter by size only):
+
+    {
+    "size": "147"
+    }
+
+Body(Option3 filter by both model and size):
+
+    {
+    "model":"activePro",
+    "size": "147"  
+    }
+
+
 #### Register Endpoint (/register):
     methods: POST
     data: SELECT * FROM authenticator
