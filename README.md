@@ -86,14 +86,14 @@ User3 (Customer_rep):
 
 User4 (Storekeeper):
     {
-    "username": "User1",
-    "password": "password1"
+    "username": "User4",
+    "password": "password4"
     }
 
 User5 (Production_planner):
     {
-    "username": "User1",
-    "password": "password1"
+    "username": "User5",
+    "password": "password5"
     }
 
 #### Customer Endpoint (/customer):
