@@ -64,6 +64,38 @@ Body:
 
 After logging in as a user you will get all the permissions that the user has due to their saved role. 
 
+##### Existing Users in the data base
+
+User1 (Customer):
+    {
+    "username": "User1",
+    "password": "password1"
+    }
+
+User2 (Transporter):
+    {
+    "username": "User2",
+    "password": "password2"
+    }
+
+User3 (Customer_rep):
+    {
+    "username": "User3",
+    "password": "password3"
+    }
+
+User4 (Storekeeper):
+    {
+    "username": "User4",
+    "password": "password4"
+    }
+
+User5 (Production_planner):
+    {
+    "username": "User5",
+    "password": "password5"
+    }
+
 #### Customer Endpoint (/customer):
     method: GET, POST, PUT, DELETE
     data: SELECT * FROM `orders`
