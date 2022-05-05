@@ -27,6 +27,42 @@ In this README you'll see examples provided of how to interract with the databas
     methods: GET
     data: SELECT * FROM ski
 
+#### Register Endpoint (/register):
+    methods: POST
+    data: SELECT * FROM authenticator
+
+##### Example Endpoint commands in Postman:
+Method: **Post**
+
+URL: http://127.0.0.1:5000/register
+
+Body: 
+
+    {
+    "username": "User6",
+    "password": "password6",
+    "Role": "Customer"
+    }
+
+The username must be unique in order for the new user to be registered.
+
+#### Login Endpoint (/login)
+    methods: POST
+    data: SELECT role FROM authenticator
+
+##### Example Endpoint commands in Postman:
+method: **POST**
+
+URL: http://127.0.0.1:5000/login
+
+Body: 
+
+    {
+    "username": "User1",
+    "password": "password1"
+    }
+
+After logging in as a user you will get all the permissions that the user has due to their saved role. 
 
 #### Customer Endpoint (/customer):
     method: GET, POST, PUT, DELETE
