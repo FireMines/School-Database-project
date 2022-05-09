@@ -42,7 +42,11 @@ def customer_info():
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer,))
             else:
                 if startDate != "":
-                    customer_info= cur.execute("SELECT * FROM `productionplan` WHERE `startDate`>=%s",(lastMonth,))
+                    productionplan = cur.execute("SELECT `planID` FROM `productionplan` WHERE `startDate`>=%s",(lastMonth,))
+                    if productionplan > 0:
+                        customer_info= cur.execute("SELECT * FROM `productionplanreference` WHERE `planID`=%s",(productionplan,))
+                    else:
+                        print ("heiNora")
                 else:
                     print ("Heipappa")
         else:
