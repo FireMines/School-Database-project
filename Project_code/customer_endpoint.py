@@ -169,42 +169,32 @@ def customer_split():
 
         data = request.get_json()
         
-        customer_id=data['customer_id']
         orderNumber=data['orderNumber']
         productID=data['productID']
         splitAmount=data['splitAmount']
         
         cur=consts.mysql.connection.cursor()
         
-        order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
         orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
-
-        if order_info > 0:
-            if orderNumber_info > 0:
-                checkIfAlreadyCancelled = cur.execute("SELECT `state` FROM `orders` WHERE `orderNumber`=%s",(orderNumber,))
-                checkIfAlreadyCancelled = cur.fetchall()
-                print(checkIfAlreadyCancelled)
-                if checkIfAlreadyCancelled == 'cancelled': # Error here
-                    cancell_order_info = cur.execute("UPDATE `orders` SET `state`='cancelled' WHERE `customer_id`=%s AND `orderNumber`=%s", (customer_id,orderNumber,))
-                    consts.mysql.connection.commit()
-
-                    cancell_order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
-
-                    if cancell_order_info > 0:
-                        cancell_order_info = cur.fetchall()
+        ##Check if order exists
+        if orderNumber_info > 0:
             
-                    return jsonify(cancell_order_info),http.HTTPStatus.CREATED
-                else:
-                    return "That order is already set to cancelled!",http.HTTPStatus.BAD_REQUEST
-            else:
-                return "That ordernumber already exists!",http.HTTPStatus.BAD_REQUEST
-
-        else:
+            #Fetch reference data with the same orderID
+            reference_info = cur.execute("SELECT * FROM `order_reference_skis` WHERE `orderNumber`=%s AND `productID`=%s", (orderNumber,productID,))
+            reference_info = cur.fetchall()
+            
+            #Create new order with same customer
+            
+            #Create new reference with desired quantity and productID
+            #OrderNumber links to the newly created ordernumber
+            
+            
             cur.close()
-            if order_info > 0:
-                return "Unable to add a order, customerID does not exists!", http.HTTPStatus.BAD_REQUEST
-            else:
-                return "Tried to create order with non existing customerID",http.HTTPStatus.BAD_REQUEST
+            return jsonify(reference_info),http.HTTPStatus.OK
+        else:
+            return "That ordernumber doesnt exist!",http.HTTPStatus.BAD_REQUEST
+
+        
         
     else:
         return "Method not implemented! Choose PUT instead"
