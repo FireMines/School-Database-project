@@ -29,12 +29,10 @@ def customer_info():
             if customer != "":
                 if since_filter != "":
                     if specific_order != "":# and state:
-                        print ("Hei")
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `date`>=%s",(specific_order,since_filter,))
 
                     else: 
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s AND `date`>=%s",(customer,since_filter))
-                        print ("Heimamma")
                 else:
                     if specific_order != "":# and state:
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s",(specific_order,))
@@ -46,9 +44,9 @@ def customer_info():
                     if productionplan > 0:
                         customer_info= cur.execute("SELECT * FROM `productionplanreference` WHERE `planID`=%s",(productionplan,))
                     else:
-                        print ("heiNora")
+                        return "No productionplans for this ID!",http.HTTPStatus.BAD_REQUEST
                 else:
-                    print ("Heipappa")
+                    return "No start date added to find last 4 weeks production plans!",http.HTTPStatus.BAD_REQUEST
         else:
             return "Remember to add your customerID",http.HTTPStatus.BAD_REQUEST
 
