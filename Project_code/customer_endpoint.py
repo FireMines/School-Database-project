@@ -1,6 +1,8 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
 import consts
+import datetime
+import http
 
 #                       #
 #   Customer endpoint   #
@@ -13,30 +15,44 @@ def customer_info():
         cur=consts.mysql.connection.cursor()
 
         if data:
-            customer=data['customer_id']
+            customer=data.get('customer_id', "")
             specific_order = data.get('orderNumber', "")
             since_filter = data.get('date', "")
+            #fourWeekPlan = data.get("True", "False")
+            startDate = data.get('startDate', "")
+            today = datetime.date.today()
+            first = today.replace(day=1)
+            lastMonth = first - datetime.timedelta(days=21)
 
-            if since_filter != "":
-                if specific_order != "":# and state:
-                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `date`>=%s",(specific_order,since_filter,))
-                else: 
-                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s AND `date`>=%s",(customer,since_filter))
+            print(lastMonth)
+
+            if customer != "":
+                if since_filter != "":
+                    if specific_order != "":# and state:
+                        print ("Hei")
+                        customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `date`>=%s",(specific_order,since_filter,))
+
+                    else: 
+                        customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s AND `date`>=%s",(customer,since_filter))
+                        print ("Heimamma")
+                else:
+                    if specific_order != "":# and state:
+                        customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s",(specific_order,))
+                    else: 
+                        customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer,))
             else:
-                if specific_order != "":# and state:
-                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s",(specific_order,))
-                else: 
-                    customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer,))
-
-
+                if startDate != "":
+                    customer_info= cur.execute("SELECT * FROM `productionplan` WHERE `startDate`>=%s",(lastMonth,))
+                else:
+                    print ("Heipappa")
         else:
-            return "Remember to add your customerID",400
+            return "Remember to add your customerID",http.HTTPStatus.BAD_REQUEST
 
         if customer_info >0:
             customer_info = cur.fetchall()
 
         cur.close()
-        return jsonify(customer_info),201
+        return jsonify(customer_info),http.HTTPStatus.OK
 
     elif request.method == 'PUT':
 
@@ -63,18 +79,18 @@ def customer_info():
                     if cancell_order_info > 0:
                         cancell_order_info = cur.fetchall()
             
-                    return jsonify(cancell_order_info),201
+                    return jsonify(cancell_order_info),http.HTTPStatus.CREATED
                 else:
-                    return "That order is already set to cancelled!",400
+                    return "That order is already set to cancelled!",http.HTTPStatus.BAD_REQUEST
             else:
-                return "That ordernumber already exists!",400
+                return "That ordernumber already exists!",http.HTTPStatus.BAD_REQUEST
 
         else:
             cur.close()
             if order_info > 0:
-                return "Unable to add a order, customerID does not exists!", 400
+                return "Unable to add a order, customerID does not exists!", http.HTTPStatus.BAD_REQUEST
             else:
-                return "Tried to create order with non existing customerID",400
+                return "Tried to create order with non existing customerID",http.HTTPStatus.BAD_REQUEST
 
     elif request.method == 'POST':
         data = request.get_json()
@@ -104,16 +120,16 @@ def customer_info():
                 if add_order_info > 0:
                     add_order_info = cur.fetchall()
         
-                return jsonify(add_order_info),201
+                return jsonify(add_order_info),http.HTTPStatus.CREATED
             else:
-                return "That ordernumber already exists!",400
+                return "That ordernumber already exists!",http.HTTPStatus.BAD_REQUEST
 
         else:
             cur.close()
             if order_info > 0:
-                return "Unable to add a order, customerID does not exists!", 400
+                return "Unable to add a order, customerID does not exists!", http.HTTPStatus.BAD_REQUEST
             else:
-                return "Tried to create order with non existing customerID",400
+                return "Tried to create order with non existing customerID",http.HTTPStatus.BAD_REQUEST
 
     elif request.method == 'DELETE':
 
@@ -136,11 +152,11 @@ def customer_info():
                     if deleteOrder > 0:
                         deleteOrder = cur.fetchall()
             
-                    return jsonify(deleteOrder),201
+                    return jsonify(deleteOrder),http.HTTPStatus.OK
             else:
-                return "That ordernumber does not exists!",400
+                return "That ordernumber does not exists!",http.HTTPStatus.BAD_REQUEST
         else:
-            return "CustomerID does not exist!",400
+            return "CustomerID does not exist!",http.HTTPStatus.BAD_REQUEST
 
     else:
         return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"

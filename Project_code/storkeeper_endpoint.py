@@ -1,6 +1,7 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
 import consts
+import http
 
 #                               #
 #   Storekeeper endpoints       #
@@ -20,7 +21,7 @@ def storekeeper():
             order_info = cur.fetchall()
 
         cur.close()
-        return jsonify(order_info),201
+        return jsonify(order_info),http.HTTPStatus.CREATED
 
     #           #
     #   PUT     #
@@ -43,11 +44,11 @@ def storekeeper():
                 order_info = cur.fetchall()
 
             cur.close()
-            return jsonify(order_info),201
+            return jsonify(order_info),http.HTTPStatus.CREATED
 
         else:
             cur.close()
-            return "There is no order with this order number that is available to be ready to be shipped!",400
+            return "There is no order with this order number that is available to be ready to be shipped!",http.HTTPStatus.BAD_REQUEST
         
 
     #           #
@@ -88,10 +89,10 @@ def storekeeper():
                 shipments_info = cur.fetchall()
 
             cur.close()
-            return jsonify(shipments_info),201
+            return jsonify(shipments_info),http.HTTPStatus.CREATED
         else :
             cur.close()
-            return "This product already exist in the database",400
+            return "This product already exist in the database",http.HTTPStatus.BAD_REQUEST
 
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")

@@ -1,6 +1,7 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
 import consts
+import http
 
 
 #                                   #
@@ -26,7 +27,7 @@ def production_planner():
             plan_info = cur.fetchall()
 
         cur.close()
-        return jsonify(plan_info),201
+        return jsonify(plan_info),http.HTTPStatus.CREATED
 
     #           #
     #   POST    #
@@ -62,10 +63,10 @@ def production_planner():
                 plan_info = cur.fetchall()
 
             cur.close()
-            return jsonify(plan_info),201
+            return jsonify(plan_info),http.HTTPStatus.CREATED
         else :
             cur.close()
-            return "This plan already exist in the database",400
+            return "This plan already exist in the database",http.HTTPStatus.BAD_REQUEST
 
     else:
         print("Method not implemented! Choose between GET or POST instead")

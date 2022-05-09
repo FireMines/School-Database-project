@@ -2,6 +2,7 @@ from asyncio.windows_events import NULL
 import http
 from flask import request, jsonify
 import consts
+import http
 
 #                               #
 #   Customer rep endpoints      #
@@ -87,13 +88,13 @@ def customer_rep():
                 shipments_info = cur.fetchall()
 
             cur.close()
-            return jsonify(shipments_info),201
+            return jsonify(shipments_info),http.HTTPStatus.CREATED
         else :
             cur.close()
             if shipment_info >0:
-                return "A shipment with this shipment number already exists",400
+                return "A shipment with this shipment number already exists",http.HTTPStatus.BAD_REQUEST
             else:
-                return "Tried to create shipment with non existing order or transporter",400
+                return "Tried to create shipment with non existing order or transporter",http.HTTPStatus.BAD_REQUEST
             
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")

@@ -1,6 +1,7 @@
 from asyncio.windows_events import NULL
 from flask import request, jsonify
 import consts
+import http
 
 #                                   #
 #   transporter/shipping endpoint   #
@@ -17,7 +18,7 @@ def get_transporter_info():
             transporter_info = cur.fetchall()
 
         cur.close()
-        return jsonify(transporter_info),201
+        return jsonify(transporter_info),http.HTTPStatus.CREATED
     
     elif request.method == 'PUT':
         data = request.get_json()
@@ -36,7 +37,7 @@ def get_transporter_info():
             account_info = cur.fetchall()
 
         cur.close()
-        return jsonify(account_info),201
+        return jsonify(account_info),http.HTTPStatus.CREATED
     
     
     else:
