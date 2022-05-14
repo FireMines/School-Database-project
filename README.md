@@ -132,19 +132,26 @@ URL: http://127.0.0.1:5000/customer
 
 Body:
 
+If you want to search for customer and a specific ordernumber:
     {
     "customer_id": 1,
     "orderNumber": 5
     }
+If you want to search for customer and all its orders:
 
     {
     "customer_id": 1
     }
-
+If you want to search for customer and a specific ordernumber with a since filter:
     {
     "customer_id": 1,
     "orderNumber": 5,
     "date": "2022-03-30 12:23:34"
+    }
+If you want to retrieve a four week production plan summary from a specific date:
+
+    {
+    "startDate": "2022-05-26 16:03:00"
     }
 
 Method: **Post**

@@ -162,3 +162,39 @@ def customer_info():
 
     else:
         return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"
+    
+def customer_split():
+    
+    if request.method == 'PUT':
+
+        data = request.get_json()
+        
+        orderNumber=data['orderNumber']
+        productID=data['productID']
+        splitAmount=data['splitAmount']
+        
+        cur=consts.mysql.connection.cursor()
+        
+        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
+        ##Check if order exists
+        if orderNumber_info > 0:
+            
+            #Fetch reference data with the same orderID
+            reference_info = cur.execute("SELECT * FROM `order_reference_skis` WHERE `orderNumber`=%s AND `productID`=%s", (orderNumber,productID,))
+            reference_info = cur.fetchall()
+            
+            #Create new order with same customer
+            
+            #Create new reference with desired quantity and productID
+            #OrderNumber links to the newly created ordernumber
+            
+            
+            cur.close()
+            return jsonify(reference_info),http.HTTPStatus.OK
+        else:
+            return "That ordernumber doesnt exist!",http.HTTPStatus.BAD_REQUEST
+
+        
+        
+    else:
+        return "Method not implemented! Choose PUT instead"
