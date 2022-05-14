@@ -26,7 +26,7 @@ def loggingIn():
             consts.userRole = userData[3] # The role for the user
 
         if dbPassword == hashPassword(password, salt).hex() and foundUser:
-            return "Logged in as " + consts.userRole, http.HTTPStatus.ACCEPTED
+            return "Logged in as " + consts.userRole, http.HTTPStatus.OK
         else: 
             return "password/username not recognized", http.HTTPStatus.UNAUTHORIZED
     else: 

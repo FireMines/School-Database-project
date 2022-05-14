@@ -1,5 +1,6 @@
 import unittest
 import requests
+import http
 
 class Test_API(unittest.TestCase):
     LOGIN_API_URL = "http://127.0.0.1:5000/login"
@@ -58,35 +59,40 @@ class Test_API(unittest.TestCase):
     
         
     def test_1_check_get_api(self):
-        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
-        self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code,200)
+        response = requests.post(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
+        self.assertEqual(response.status_code,http.HTTPStatus.OK)
 
 
         response = requests.get(Test_API.CUSTOMER_GET_API_URL, json=Test_API.GET_CUSTOMER_API_TEST)
         self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code,http.HTTPStatus.OK)
         
     def test_2_check_get_api(self):
-        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
-        self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code,200)
-
+        response = requests.post(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
+        self.assertEqual(response.status_code,http.HTTPStatus.OK)
         
-        response = requests.get(Test_API.GET_PRODUCT_MODEL_API_URL, json=Test_API.GET_CUSTOMER_FILTER_API_TEST)
+        response = requests.get(Test_API.CUSTOMER_GET_API_URL, json=Test_API.GET_CUSTOMER_FILTER_API_TEST)
         self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code,http.HTTPStatus.OK)
+
         
     def test_3_check_get_api(self):
-        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
-        self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code,200)
+        response = requests.post(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
+        self.assertEqual(response.status_code,http.HTTPStatus.OK)
 
         
-        response = requests.post(Test_API.DELETE_GIVEN_ORDER_POST_API_URL, json=Test_API.GET_CUSTOMER_FOURWEEK_API_TEST)
-        self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code, 200)
+        response = requests.post(Test_API.CUSTOMER_GET_API_URL, json=Test_API.GET_CUSTOMER_FOURWEEK_API_TEST)
+        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
+        self.assertEqual(response.status_code, http.HTTPStatus.OK)
         self.assertEqual(response.json(), Test_API.DELETE_CUSTOMER_API_TEST )
+
+test = Test_API()
+test.test_1_check_get_api()
+test.test_2_check_get_api()
+#test.test_3_check_get_api()
     
 #    def test_4_check_post_incorrect_input_api(self):
 #        
