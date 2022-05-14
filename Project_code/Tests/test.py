@@ -2,38 +2,47 @@ import unittest
 import requests
 
 class Test_API(unittest.TestCase):
-    SKIS_AVAILABLE_GET_API_URL = "http://127.0.0.1:5000/get_skis_available"   
-    GET_PRODUCT_MODEL_API_URL = "http://127.0.0.1:5000/get_products_model"           
-    DELETE_GIVEN_ORDER_POST_API_URL = "http://127.0.0.1:5000/delete_given_order"     
-    UPDATE_STATE_OF_SHIPMENT_POST_API_URL = "http://127.0.0.1:5000/UpdateStateOfShipment"  
-    
-    GET_PROUCT_MODEL_API_TEST_JSON_CORRECT_INPUT = {
-        
-        "model":"Redline"
-        
+    LOGIN_API_URL = "http://127.0.0.1:5000/login"
+    CUSTOMER_GET_API_URL = "http://127.0.0.1:5000/customer"   
+    GET_PRODUCT_MODEL_API_URL = "http://127.0.0.1:5000/customer_rep"           
+    DELETE_GIVEN_ORDER_POST_API_URL = "http://127.0.0.1:5000/storekeeper"     
+    UPDATE_STATE_OF_SHIPMENT_POST_API_URL = "http://127.0.0.1:5000/production_planner"  
+
+    CUSTOMER_LOGIN_INFO = {
+        "username": "User1",
+        "password": "password1"
     }
     
-    GET_PRODUCT_MODEL_API_TEST_JSON_INCORRECT_INPUT = {
-        
-        "model":"Speedy"
-        
+    GET_CUSTOMER_API_TEST = {
+        "customer_id":1
     }
     
-    GET_PRODUCT_MODEL_API_TEST_JSON_CORRECT_OUTPUT = {"22222", "Redline", "classic", "144", "beginner", "0", "url", "4000.0"}
-    
-    DELETE_GIVEN_ORDER_POST_API_TEST_JSON_CORRECT_INPUT = { 
-                                                           
-    "order_no":"9101",
-                                            
+    GET_CUSTOMER_FILTER_API_TEST = {
+        "customer_id": 1,
+        "orderNumber": 20
     }
     
-    DELETE_GIVEN_ORDER_POST_API_TEST_JSON_INCORRECT_INPUT = {
-        
-    "order_no":"0"
+    GET_CUSTOMER_FOURWEEK_API_TEST = {    
+        "startDate": "2022-05-26 16:03:00"
     }
     
-    DELETE_GIVEN_ORDER_POST_API_TEST_JSON_CORRECT_OUTPUT = "Order 9101 was deleted from database"
+    POST_CUSTOMER_API_TEST = {                                                 
+        "customer_id": 1,
+        "orderNumber": 2050,
+        "quantity": 10,
+        "productID": 2                                          
+    }
     
+    PUT_CUSTOMER_API_TEST = {
+        "customer_id": 1,
+        "orderNumber": 12100
+    }
+    
+    DELETE_CUSTOMER_API_TEST = {
+    "customer_id": 1,
+    "orderNumber": 15
+    }    
+
     UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_CORRECT_INPUT = { 
                                                            
     "shipment_number":"222",
@@ -49,39 +58,51 @@ class Test_API(unittest.TestCase):
     
         
     def test_1_check_get_api(self):
-        
-        response = requests.get(Test_API.SKIS_AVAILABLE_GET_API_URL)
+        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"application/json")
+        self.assertEqual(response.status_code,200)
+
+
+        response = requests.get(Test_API.CUSTOMER_GET_API_URL, json=Test_API.GET_CUSTOMER_API_TEST)
         self.assertEqual(response.headers["Content-Type"],"application/json")
         self.assertEqual(response.status_code,200)
         
     def test_2_check_get_api(self):
+        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"application/json")
+        self.assertEqual(response.status_code,200)
+
         
-        response = requests.get(Test_API.GET_PRODUCT_MODEL_API_URL)
+        response = requests.get(Test_API.GET_PRODUCT_MODEL_API_URL, json=Test_API.GET_CUSTOMER_FILTER_API_TEST)
         self.assertEqual(response.headers["Content-Type"],"application/json")
         self.assertEqual(response.status_code,200)
         
-    def test_3_check_post_correct_input_api(self):
+    def test_3_check_get_api(self):
+        response = requests.get(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
+        self.assertEqual(response.headers["Content-Type"],"application/json")
+        self.assertEqual(response.status_code,200)
+
         
-        response = requests.post(Test_API.DELETE_GIVEN_ORDER_POST_API_URL, json=Test_API.DELETE_GIVEN_ORDER_POST_API_TEST_JSON_CORRECT_INPUT)
+        response = requests.post(Test_API.DELETE_GIVEN_ORDER_POST_API_URL, json=Test_API.GET_CUSTOMER_FOURWEEK_API_TEST)
         self.assertEqual(response.headers["Content-Type"],"application/json")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), Test_API.DELETE_GIVEN_ORDER_POST_API_TEST_JSON_CORRECT_OUTPUT )
+        self.assertEqual(response.json(), Test_API.DELETE_CUSTOMER_API_TEST )
     
-    def test_4_check_post_incorrect_input_api(self):
-        
-       response = requests.post(Test_API.DELETE_GIVEN_ORDER_POST_API_URL, json=Test_API.DELETE_GIVEN_ORDER_POST_API_TEST_JSON_INCORRECT_INPUT)
-       self.assertEqual(response.headers["Content-Type"],"application/json")
-       self.assertEqual(response.status_code, 404)
-    def test_5_check_post_correct_input_api(self):
-        
-        response = requests.post(Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_URL, json=Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_CORRECT_INPUT)
-        self.assertEqual(response.headers["Content-Type"],"application/json")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_CORRECT_OUTPUT )
-    
-    def test_6_check_post_incorrect_input_api(self):
-        
-       response = requests.post(Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_URL, json=Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_INCORRECT_INPUT)
-       self.assertEqual(response.headers["Content-Type"],"application/json")
-       self.assertEqual(response.status_code, 404)
-        
+#    def test_4_check_post_incorrect_input_api(self):
+#        
+#       response = requests.post(Test_API.DELETE_GIVEN_ORDER_POST_API_URL, json=Test_API.PUT_CUSTOMER_API_TEST)
+#       self.assertEqual(response.headers["Content-Type"],"application/json")
+#       self.assertEqual(response.status_code, 404)
+#    def test_5_check_post_correct_input_api(self):
+#        
+#        response = requests.post(Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_URL, json=Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_CORRECT_INPUT)
+#        self.assertEqual(response.headers["Content-Type"],"application/json")
+#        self.assertEqual(response.status_code, 200)
+#        self.assertEqual(response.json(), Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_CORRECT_OUTPUT )
+#    
+#    def test_6_check_post_incorrect_input_api(self):
+#        
+#       response = requests.post(Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_URL, json=Test_API.UPDATE_STATE_OF_SHIPMENT_POST_API_TEST_JSON_INCORRECT_INPUT)
+#       self.assertEqual(response.headers["Content-Type"],"application/json")
+#       self.assertEqual(response.status_code, 404)
+#        
