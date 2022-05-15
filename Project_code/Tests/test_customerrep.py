@@ -4,7 +4,7 @@ import http
 
 class Test_API(unittest.TestCase):
     LOGIN_API_URL = "http://127.0.0.1:5000/login"
-    customerrep_GET_API_URL = "http://127.0.0.1:5000/customerrep"   
+    customerrep_GET_API_URL = "http://127.0.0.1:5000/customer_rep"   
 
     customerrep_LOGIN_INFO = {
         "username": "User3",
@@ -16,15 +16,11 @@ class Test_API(unittest.TestCase):
     }
     
     POST_customerrep_API_TEST = {                                                 
-        "typeID":"400", 
-        "type":"classic",
-        "model":"active",
-        "decription":"These are skies",
-        "image":"None",
-        "msrp":"200,50",
-        "productID":"100000",
-        "length":"147",
-        "weight":"20-30"    
+        "shipment_number":"2",
+        "order_number": "200200",
+        "transporterID":"1",
+        "address":"FC Habbo",
+        "date": "2022-05-26 16:03:00"   
     }
     
     PUT_customerrep_API_TEST = {
@@ -66,7 +62,7 @@ class Test_API(unittest.TestCase):
 
         for _, data in testdata.items():
             Test_API.login(self)
-            
+
             response = data["method"](data["url"], json=data["json"])
             self.assertEqual(response.headers["Content-Type"],"application/json")
             self.assertEqual(response.status_code,data["expectedCode"])
