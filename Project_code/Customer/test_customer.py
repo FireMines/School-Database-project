@@ -3,8 +3,12 @@ import requests
 import http
 
 class Test_API(unittest.TestCase):
+
+    # URLS used in tests
     LOGIN_API_URL = "http://127.0.0.1:5000/login"
     CUSTOMER_GET_API_URL = "http://127.0.0.1:5000/customer"   
+
+    # Input data sendt with
 
     CUSTOMER_LOGIN_INFO = {
         "username": "User1",
@@ -41,6 +45,7 @@ class Test_API(unittest.TestCase):
         "orderNumber": 123
     }
 
+    # Expected data returned after deleting a customer
     DELETE_CUSTOMER_API_TEST_REMAINING_DATA = [
             [
                 20,
@@ -53,6 +58,7 @@ class Test_API(unittest.TestCase):
             ]
         ]
         
+    # The test itself which runs everything    
     def testAll(self):
         testdata = {
             "get_customer" : {
@@ -98,6 +104,8 @@ class Test_API(unittest.TestCase):
                 "method" : requests.delete  
             }
         }
+
+        # For loop which goes through every piece of data above and tests it automatically
         for _, data in testdata.items():
             Test_API.login(self)
 
@@ -109,14 +117,14 @@ class Test_API(unittest.TestCase):
                 self.assertEqual(response.json(), expectedValue)
 
 
-
+    # Function to log in with the user needed to have access
     def login(self):
         response = requests.post(Test_API.LOGIN_API_URL, json=Test_API.CUSTOMER_LOGIN_INFO)
         self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
         self.assertEqual(response.status_code,http.HTTPStatus.OK)        
         
 
-
+# Runs the tests here
 test = Test_API()
 test.testAll()
 

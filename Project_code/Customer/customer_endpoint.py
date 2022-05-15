@@ -14,7 +14,9 @@ def customer_info():
 
         cur=consts.mysql.connection.cursor()
 
+        # If any data exists in input
         if data:
+            # By doing data.get the input becomes optional depending on what you want to get
             customer=data.get('customer_id', "")
             specific_order = data.get('orderNumber', "")
             since_filter = data.get('date', "")
@@ -23,24 +25,24 @@ def customer_info():
             first = today.replace(day=1)
             lastMonth = first - datetime.timedelta(days=21)
 
-            print(lastMonth)
 
-            if customer != "":
+            # Filter what request you want to do
+            if customer != "":  
                 if since_filter != "":
-                    if specific_order != "":# and state:
+                    if specific_order != "":    # Get a specific orders with a since filter
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s AND `date`>=%s",(specific_order,since_filter,))
 
-                    else: 
+                    else:                       # Get all orders from a specific customer
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s AND `date`>=%s",(customer,since_filter))
                 else:
-                    if specific_order != "":# and state:
+                    if specific_order != "":    # Get all info from a specific order
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s",(specific_order,))
-                    else: 
+                    else:                       # Get all data from a customer
                         customer_info= cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s",(customer,))
             else:
-                if startDate != "":
+                if startDate != "":            # Checks if there are any productions from the last month aka 4 weeks
                     productionplan = cur.execute("SELECT `planID` FROM `productionplan` WHERE `startDate`>=%s",(lastMonth,))
-                    if productionplan > 0:
+                    if productionplan > 0:      # Returns production plan for the last month
                         customer_info= cur.execute("SELECT * FROM `productionplanreference` WHERE `planID`=%s",(productionplan,))
                     else:
                         return jsonify("No productionplans for this ID!"),http.HTTPStatus.BAD_REQUEST
@@ -66,12 +68,16 @@ def customer_info():
         order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
         orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
 
+        # Check if any orders exists with inputed customer_id
         if order_info > 0:
-            if orderNumber_info > 0:
+
+            # Check if any orders exists with inputed ordernumber
+            if orderNumber_info > 0: 
                 checkIfAlreadyCancelled = cur.execute("SELECT `state` FROM `orders` WHERE `orderNumber`=%s",(orderNumber,))
                 checkIfAlreadyCancelled = cur.fetchall()
-                print(checkIfAlreadyCancelled)
-                if checkIfAlreadyCancelled == 'cancelled': # Error here
+
+                # Makes order cancelled if its not already
+                if checkIfAlreadyCancelled == 'cancelled': 
                     cancell_order_info = cur.execute("UPDATE `orders` SET `state`='cancelled' WHERE `customer_id`=%s AND `orderNumber`=%s", (customer_id,orderNumber,))
                     consts.mysql.connection.commit()
 
@@ -105,9 +111,14 @@ def customer_info():
         order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
         orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
 
+        # Check if any orders exists with inputed customer_id
         if order_info > 0:
+
+            # Check if any orders exists with inputed ordernumber
             if not orderNumber_info:
                 checkProductID = cur.execute("SELECT * FROM `ski` WHERE `productID`=%s", (productID,))
+
+                # Check if any products exists with inputed productID
                 if not checkProductID:
                     return jsonify("ProductID which you are trying to order doesnt exist!"), http.HTTPStatus.BAD_REQUEST
 
@@ -142,8 +153,11 @@ def customer_info():
 
         order_info = cur.execute("SELECT * FROM `orders` WHERE `customer_id`=%s", (customer_id,))
         orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
-        print(orderNumber_info)
+
+        # Check if any orders exists with inputed customer_id
         if order_info:
+
+            # Check if any orders exists with inputed ordernumber
             if orderNumber_info > 0:
                     deleteOrder = cur.execute("DELETE FROM `orders` WHERE `orders`.`orderNumber` = %s",(orderNumber,))
                     consts.mysql.connection.commit()
@@ -162,40 +176,3 @@ def customer_info():
     else:
         return jsonify("Method not implemented! Choose between GET, POST, PUT or DELETE instead"), http.HTTPStatus.NOT_IMPLEMENTED
     
-    
-    ##This does not work
-#def customer_split():
-    
-    if request.method == 'PUT':
-
-        data = request.get_json()
-        
-        orderNumber=data['orderNumber']
-        productID=data['productID']
-        splitAmount=data['splitAmount']
-        
-        cur=consts.mysql.connection.cursor()
-        
-        orderNumber_info = cur.execute("SELECT * FROM `orders` WHERE `orderNumber`=%s", (orderNumber,))
-        ##Check if order exists
-        if orderNumber_info > 0:
-            
-            #Fetch reference data with the same orderID
-            reference_info = cur.execute("SELECT * FROM `order_reference_skis` WHERE `orderNumber`=%s AND `productID`=%s", (orderNumber,productID,))
-            reference_info = cur.fetchall()
-            
-            #Create new order with same customer
-            
-            #Create new reference with desired quantity and productID
-            #OrderNumber links to the newly created ordernumber
-            
-            
-            cur.close()
-            return jsonify(reference_info),http.HTTPStatus.OK
-        else:
-            return "That ordernumber doesnt exist!",http.HTTPStatus.BAD_REQUEST
-
-        
-        
-    else:
-        return "Method not implemented! Choose PUT instead"
