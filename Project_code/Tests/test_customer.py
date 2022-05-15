@@ -108,11 +108,8 @@ class Test_API(unittest.TestCase):
                 self.assertEqual(response.headers["Content-Type"],"application/json")
             self.assertEqual(response.status_code,data["expectedCode"])
             expectedValue = data["expectedValue"]
-            print("kebab")
             if expectedValue != None:
-                print("ruud is the dude")
                 self.assertEqual(response.json(), expectedValue)
-
 
 
     def login(self):
@@ -120,35 +117,6 @@ class Test_API(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
         self.assertEqual(response.status_code,http.HTTPStatus.OK)        
         
-
-#    def test_post_customer(self):
-#        Test_API.login()
-
-        
-#        response = requests.post(Test_API.CUSTOMER_GET_API_URL, json=Test_API.POST_CUSTOMER_API_TEST)
-        #self.assertEqual(response.headers["Content-Type"],"application/json")
-        #self.assertEqual(response.status_code, http.HTTPStatus.CREATED)
-#        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
-#        self.assertEqual(response.status_code, http.HTTPStatus.BAD_REQUEST)
-
-
-#    def test_put_customer(self):
-#        Test_API.login()
-
-        
-#        response = requests.post(Test_API.CUSTOMER_GET_API_URL, json=Test_API.POST_CUSTOMER_API_TEST)
-#        #self.assertEqual(response.headers["Content-Type"],"application/json")
-#        #self.assertEqual(response.status_code, http.HTTPStatus.CREATED)
-#        self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
-#        self.assertEqual(response.status_code, http.HTTPStatus.OK)
-
-#    def test_delete_customer(self):
-#        Test_API.login()
-        
-#        response = requests.delete(Test_API.CUSTOMER_GET_API_URL, json=Test_API.DELETE_CUSTOMER_API_TEST)
-#        self.assertEqual(response.headers["Content-Type"],"application/json")
-#        self.assertEqual(response.status_code, http.HTTPStatus.OK)
-#        self.assertEqual(response.json(), Test_API.DELETE_CUSTOMER_API_TEST_REMAINING_DATA )
 
 test = Test_API()
 test.testAll()
