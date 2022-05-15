@@ -163,7 +163,9 @@ def customer_info():
     else:
         return "Method not implemented! Choose between GET, POST, PUT or DELETE instead"
     
-def customer_split():
+    
+    ##This does not work
+#def customer_split():
     
     if request.method == 'PUT':
 

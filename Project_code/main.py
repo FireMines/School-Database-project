@@ -53,10 +53,10 @@ def customer():
 #                             #
 @app.route('/customer_split',methods=['PUT'])
 def customer_split(): 
-    #if consts.userRole == "Customer":
+    if consts.userRole == "Customer":
         return customer_endpoint.customer_split()  
-    #else:
-        #return "Do not have permissions for this endpoint", http.HTTPStatus.UNAUTHORIZED 
+    else:
+        return "Do not have permissions for this endpoint", http.HTTPStatus.UNAUTHORIZED 
     
 #                               #
 #   Customer rep endpoints      #
