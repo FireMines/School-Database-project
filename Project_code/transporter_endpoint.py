@@ -18,7 +18,7 @@ def get_transporter_info():
             transporter_info = cur.fetchall()
 
         cur.close()
-        return jsonify(transporter_info),http.HTTPStatus.CREATED
+        return jsonify(transporter_info),http.HTTPStatus.OK
     
     elif request.method == 'PUT':
         data = request.get_json()
