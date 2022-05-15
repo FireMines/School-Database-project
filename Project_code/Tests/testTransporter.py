@@ -29,7 +29,7 @@ class Test_API(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],"application/json")
         self.assertEqual(response.status_code,http.HTTPStatus.OK)
         
-    def test_2_check_get_api(self):
+    def test_2_check_put_api(self):
         Test_API.login_transport(self)
         
         response = requests.put(Test_API.TRANSPORTER_URL, json=Test_API.POST_TRANSPORTER_API_TEST)
@@ -39,4 +39,4 @@ class Test_API(unittest.TestCase):
 
 test = Test_API()
 test.test_1_check_get_api()
-test.test_2_check_get_api()
+test.test_2_check_put_api()
