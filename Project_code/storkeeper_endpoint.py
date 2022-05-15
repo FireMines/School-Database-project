@@ -21,7 +21,7 @@ def storekeeper():
             order_info = cur.fetchall()
 
         cur.close()
-        return jsonify(order_info),http.HTTPStatus.CREATED
+        return jsonify(order_info),http.HTTPStatus.OK
 
     #           #
     #   PUT     #
@@ -48,7 +48,7 @@ def storekeeper():
 
         else:
             cur.close()
-            return "There is no order with this order number that is available to be ready to be shipped!",http.HTTPStatus.BAD_REQUEST
+            return jsonify("There is no order with this order number that is available to be ready to be shipped!"),http.HTTPStatus.BAD_REQUEST
         
 
     #           #
@@ -83,16 +83,16 @@ def storekeeper():
             change_state = cur.execute("INSERT INTO `ski`(`productID`, `typeID`, `length`, `weight`) VALUES (%s, %s, %s, %s)", (product_id, type_id, ski_length, ski_weight,))
             consts.mysql.connection.commit()
 
-            shipments_info= cur.execute("SELECT * FROM `ski`")
+            product_info= cur.execute("SELECT * FROM `ski`")
 
-            if shipments_info >0:
-                shipments_info = cur.fetchall()
+            if product_info >0:
+                product_info = cur.fetchall()
 
             cur.close()
-            return jsonify(shipments_info),http.HTTPStatus.CREATED
+            return jsonify(product_info),http.HTTPStatus.CREATED
         else :
             cur.close()
-            return "This product already exist in the database",http.HTTPStatus.BAD_REQUEST
+            return jsonify("This product already exist in the database"),http.HTTPStatus.BAD_REQUEST
 
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")

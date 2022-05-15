@@ -26,7 +26,7 @@ class Test_API(unittest.TestCase):
     
     POST_CUSTOMER_API_TEST = {                                                 
         "customer_id": 1,
-        "orderNumber": 2050,
+        "orderNumber": 123,
         "quantity": 10,
         "productID": 2                                          
     }
@@ -38,7 +38,7 @@ class Test_API(unittest.TestCase):
     
     DELETE_CUSTOMER_API_TEST = {
         "customer_id": 1,
-        "orderNumber": 2050
+        "orderNumber": 123
     }
 
     DELETE_CUSTOMER_API_TEST_REMAINING_DATA = [
@@ -79,14 +79,14 @@ class Test_API(unittest.TestCase):
             "post_customer" : {
                 "url" : Test_API.CUSTOMER_GET_API_URL,
                 "json" : Test_API.POST_CUSTOMER_API_TEST,
-                "expectedCode" : http.HTTPStatus.BAD_REQUEST, #Created if data is new, if test has been run, change to Bad Request
+                "expectedCode" : http.HTTPStatus.CREATED, 
                 "expectedValue" : None, 
                 "method" : requests.post     
             },
             "put_customer" : {
                 "url" : Test_API.CUSTOMER_GET_API_URL,
                 "json" : Test_API.DELETE_CUSTOMER_API_TEST,
-                "expectedCode" : http.HTTPStatus.BAD_REQUEST, #Created if data is new, if test has been run, change to Bad Request
+                "expectedCode" : http.HTTPStatus.BAD_REQUEST,
                 "expectedValue" : None, 
                 "method" : requests.put     
             },
@@ -102,14 +102,12 @@ class Test_API(unittest.TestCase):
             Test_API.login(self)
 
             response = data["method"](data["url"], json=data["json"])
-            if data["method"] != requests.get:
-                self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
-            else:
-                self.assertEqual(response.headers["Content-Type"],"application/json")
+            self.assertEqual(response.headers["Content-Type"],"application/json")
             self.assertEqual(response.status_code,data["expectedCode"])
             expectedValue = data["expectedValue"]
             if expectedValue != None:
                 self.assertEqual(response.json(), expectedValue)
+
 
 
     def login(self):
@@ -117,6 +115,7 @@ class Test_API(unittest.TestCase):
         self.assertEqual(response.headers["Content-Type"],"text/html; charset=utf-8")
         self.assertEqual(response.status_code,http.HTTPStatus.OK)        
         
+
 
 test = Test_API()
 test.testAll()

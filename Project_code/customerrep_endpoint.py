@@ -59,7 +59,7 @@ def customer_rep():
 
         else:
             cur.close()
-            return "No orders with that order number that are new or open", http.HTTPStatus.BAD_REQUEST
+            return jsonify("No orders with that order number that are new or open"), http.HTTPStatus.BAD_REQUEST
 
     #           #
     #   POST    #
@@ -92,9 +92,9 @@ def customer_rep():
         else :
             cur.close()
             if shipment_info >0:
-                return "A shipment with this shipment number already exists",http.HTTPStatus.BAD_REQUEST
+                return jsonify("A shipment with this shipment number already exists"),http.HTTPStatus.BAD_REQUEST
             else:
-                return "Tried to create shipment with non existing order or transporter",http.HTTPStatus.BAD_REQUEST
+                return jsonify("Tried to create shipment with non existing order or transporter"),http.HTTPStatus.BAD_REQUEST
             
     else:
         print("Method not implemented! Choose between GET, PUT or POST instead")
