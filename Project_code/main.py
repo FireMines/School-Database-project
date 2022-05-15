@@ -3,14 +3,14 @@ import http
 from types import NoneType
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
-import productionplanner_endpoint
-import public_endpoint
-import transporter_endpoint
-import storkeeper_endpoint
-import customerrep_endpoint
-import customer_endpoint
-import login_endpoint
-import register_endpoint
+import Customer.customer_endpoint as customer_endpoint
+import Customer_rep.customerrep_endpoint as customerrep_endpoint
+import ProductionPlanner.productionplanner_endpoint as productionplanner_endpoint
+import Utility.public_endpoint as public_endpoint
+import Utility.register_endpoint as register_endpoint
+import Utility.login_endpoint as login_endpoint
+import Transporter.transporter_endpoint as transporter_endpoint
+import Storekeeper.storkeeper_endpoint as storkeeper_endpoint
 import consts
 
 app = Flask(__name__)
@@ -51,12 +51,12 @@ def customer():
 #                             #
 #   Customer split endpoint   #
 #                             #
-@app.route('/customer_split',methods=['PUT'])
-def customer_split(): 
-    if consts.userRole == "Customer":
-        return customer_endpoint.customer_split()  
-    else:
-        return "Do not have permissions for this endpoint", http.HTTPStatus.UNAUTHORIZED 
+#@app.route('/customer_split',methods=['PUT'])
+#def customer_split(): 
+#    if consts.userRole == "Customer":
+#        return customer_endpoint.customer_split()  
+#    else:
+#        return "Do not have permissions for this endpoint", http.HTTPStatus.UNAUTHORIZED 
     
 #                               #
 #   Customer rep endpoints      #
