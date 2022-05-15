@@ -27,7 +27,7 @@ def production_planner():
             plan_info = cur.fetchall()
 
         cur.close()
-        return jsonify(plan_info),http.HTTPStatus.CREATED
+        return jsonify(plan_info),http.HTTPStatus.OK
 
     #           #
     #   POST    #
