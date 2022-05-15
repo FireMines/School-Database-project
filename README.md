@@ -325,7 +325,7 @@ Body(Optional):
     "planID":"1"
     }
 
-Note: If the get request is not followed with a specific planID it will show a summary of all plans in the database, however when searching for a specific plan it will git the productionPlan references to that plan as well.
+Note: If the get request is not followed with a specific planID it will show a summary of all plans in the database, however when searching for a specific plan it will give the productionPlan references to that plan as well.
 
 Method: POST
 
